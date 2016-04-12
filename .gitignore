@@ -14,3 +14,4 @@ pom.xml.asc
 *.log
 /.env
 node_modules
+public/js/app.js
