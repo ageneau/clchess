@@ -11,7 +11,8 @@
                  [reagent-utils "0.1.7"]
                  [secretary "1.2.3"]]
 
-  :plugins [[lein-cljsbuild "1.1.1"]]
+  :plugins [[lein-cljsbuild "1.1.1"]
+            [cider/cider-nrepl "0.12.0-SNAPSHOT"]]
 
   :min-lein-version "2.5.0"
 
