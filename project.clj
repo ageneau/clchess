@@ -9,10 +9,16 @@
                  [reagent "0.5.1"]
                  [reagent-forms "0.5.22"]
                  [reagent-utils "0.1.7"]
-                 [secretary "1.2.3"]]
+                 [secretary "1.2.3"]
+                 [prone "1.1.0"]
+                 [lein-figwheel "0.5.2"]
+                 [org.clojure/tools.nrepl "0.2.12"]
+                 [figwheel-sidecar "0.5.2"]
+                 [com.cemerick/piggieback "0.2.1"]]
 
   :plugins [[lein-cljsbuild "1.1.1"]
-            [cider/cider-nrepl "0.12.0-SNAPSHOT"]]
+            [cider/cider-nrepl "0.12.0-SNAPSHOT"]
+            [lein-figwheel "0.5.2"]]
 
   :min-lein-version "2.5.0"
 
@@ -23,32 +29,16 @@
 
   :resource-paths ["public"]
 
-  :cljsbuild {:builds {:app {:source-paths ["src"]
-                             :compiler {:output-to "public/js/app.js"
+  :cljsbuild {:builds {:app {:source-paths ["src" "env/dev/cljs"]
+                             :compiler {:main "reagent2.dev"
+                                        :output-to "public/js/app.js"
                                         :output-dir "public/js/out"
                                         :asset-path   "js/out"
                                         :optimizations :none
-                                        :pretty-print  true}}}}
+                                        :pretty-print  true
+                                        :source-map true}}}}
 
-  :profiles {:dev {:dependencies [[prone "1.1.0"]
-                                  [lein-figwheel "0.5.2"]
-                                  [org.clojure/tools.nrepl "0.2.12"]
-                                  [com.cemerick/piggieback "0.2.1"]]
-
-                   :plugins [[lein-figwheel "0.5.2"]]
-
-                   :figwheel {:http-server-root "public"
-                              :nrepl-port 7002
-                              :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"]
-                              :css-dirs ["public/css"]}
-
-                   :cljsbuild {:builds {:app {:source-paths ["env/dev/cljs"]
-                                              :compiler {:main "reagent2.dev"
-                                                         :source-map true}}}}}
-
-             :prod {:cljsbuild {:jar true
-                                :builds {:app
-                                         {:source-paths ["env/prod/cljs"]
-                                          :compiler
-                                          {:optimizations :advanced
-                                           :pretty-print false}}}}}})
+  :figwheel {:http-server-root "public"
+             :nrepl-port 7002
+             :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"]
+             :css-dirs ["public/css"]})
