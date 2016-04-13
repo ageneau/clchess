@@ -60,8 +60,22 @@
   [:input {:type "button" :value "Reset"
            :on-click #(reset-board)}])
 
+(defn atom-input [value]
+  [:input {:field :file :type :file
+           :value @value
+           :on-change #(reset! value (-> % .-target .-value))}])
+
+(defn shared-state []
+  (let [val (reagent/atom "foo")]
+    (fn []
+      [:div
+       [:p "The value is now: " @val]
+       [:p "Change it here: " [atom-input val]]])))
+
 (defn home-page []
-  [:div [reset-button]])
+  [:div
+   [shared-state]
+   [reset-button]])
 
 
 ;; -------------------------
