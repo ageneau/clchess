@@ -8,10 +8,8 @@
 (defn by-id [id]
   (.getElementById js/document (name id)))
 
-(def chessground (by-id "ground7"))
-
 (def chess (js/Chess.))
-(def ground)
+(def chessground (js/Chessground. (by-id "chessground-container")))
 
 (def SQUARES (.-SQUARES chess))
 
@@ -29,16 +27,41 @@
   (clj->js (reduce merge (map moves SQUARES))))
 
 (defn on-move [orig dest]
-  (println "on-move")
+  (println "on-move: " orig "->" dest)
   (.move chess #js {:from orig :to dest})
-  (.set ground #js {:turnColor (color) :movable #js {:color (color) :dests (dest-squares)}})
-  (println (.getFen ground)))
+  (.set chessground #js {:turnColor (color) :movable #js {:color (color) :dests (dest-squares)}})
+  (println "board fen:" (.getFen chessground)))
+
+(defn reset-board []
+  (println "reset-board")
+  (.reset chess)
+  (.set chessground #js {
+                         :viewOnly false
+                         :autoCastle true
+                         :turnColor "white"
+                         :fen "start"
+                         :animation #js { :duration 500 }
+                         :movable #js {
+                                       :free false
+                                       :color (color)
+                                       :premove true
+                                       :dests (dest-squares)
+                                       :events #js { :after on-move }
+                                       }
+                         :drawable #js { :enabled true }
+                         }))
 
 ;; -------------------------
 ;; Views
 
+
+(defn reset-button []
+  [:input {:type "button" :value "Reset"
+           :on-click #(reset-board)}])
+
 (defn home-page []
-  [:div [:h2 "Welcome to Reagent"]])
+  [:div [reset-button]])
+
 
 ;; -------------------------
 ;; Initialize app
@@ -47,20 +70,5 @@
   (reagent/render [home-page] (.getElementById js/document "app")))
 
 (defn init! []
-  (let [params #js {
-                    :viewOnly false
-                    :turnColor "white"
-                    :animation #js { :duration 500 }
-                    :movable #js {
-                                  :free false
-                                  :color (color)
-                                  :premove true
-                                  :dests (dest-squares)
-                                  :events #js { :after on-move }
-                                  }
-                    :drawable #js { :enabled true }
-                    }
-        ground2 (js/Chessground. chessground params)]
-    (println "init params:" params);
-    (set! ground ground2))
+  (reset-board)
   (mount-root))
