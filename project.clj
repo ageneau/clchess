@@ -16,7 +16,7 @@
                  [figwheel-sidecar "0.5.2"]
                  [com.cemerick/piggieback "0.2.1"]]
 
-  :plugins [[lein-cljsbuild "1.1.1"]
+  :plugins [[lein-cljsbuild "1.1.3"]
             [cider/cider-nrepl "0.12.0-SNAPSHOT"]
             [lein-figwheel "0.5.2"]]
 

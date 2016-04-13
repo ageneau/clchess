@@ -1,7 +1,8 @@
 (ns reagent2.core
     (:require [reagent.core :as reagent :refer [atom]]
               [reagent.session :as session]
-              [secretary.core :as secretary :include-macros true]))
+              [secretary.core :as secretary :include-macros true]
+              [node-webkit.core :as nw]))
 
 (enable-console-print!)
 
@@ -70,5 +71,8 @@
   (reagent/render [home-page] (.getElementById js/document "app")))
 
 (defn init! []
+  (nw/menubar! [{:label "File"
+                 :submenu (nw/menu [{:label "Quit"
+                                     :click nw/quit}])}])
   (reset-board)
   (mount-root))
