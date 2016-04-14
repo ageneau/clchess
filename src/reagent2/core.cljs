@@ -10,6 +10,9 @@
   (.getElementById js/document (name id)))
 
 (def chess (js/Chess.))
+(def loaded-game (js/Chess.))
+(def current-ply 0)
+
 (def chessground (js/Chessground. (by-id "chessground-container")))
 
 (def SQUARES (.-SQUARES chess))
@@ -82,14 +85,16 @@
 
 (defn load-pgn [pgn]
   (println "load-pgn: " pgn)
+  (set! current-ply 0)
   (.reset chess)
-  (.load_pgn chess pgn)
-  (println "FEN: " (.fen chess))
+  (.reset loaded-game)
+  (.load_pgn loaded-game pgn)
+  (println "FEN: " (.fen loaded-game))
   (.set chessground #js {
                          :viewOnly true
                          :autoCastle true
                          :turnColor "white"
-                         :fen (.fen chess)
+                         :fen "start"
                          :animation #js { :duration 500 }
                          :drawable #js { :enabled true }
                          }))
@@ -121,6 +126,13 @@
 
 (defn home-page []
   [:div
+   [:div
+    [:input {:type "button" :value "back"}]
+    [:input {:type "button" :value "next"
+             :on-click #(let [move (js->clj (get (.history loaded-game #js {:verbose true}) current-ply))]
+                          (println "From: " (move "from") " to:" (move "to"))
+                          (.move chessground (move "from") (move "to"))
+                          (set! current-ply (inc current-ply)))}]]
    [shared-state]
    [reset-button]])
 
