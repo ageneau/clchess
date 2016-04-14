@@ -52,6 +52,48 @@
                          :drawable #js { :enabled true }
                          }))
 
+(defn read-file [file]
+  (print "read: " file)
+  (let [fs (js/require "fs")]
+    (when (.existsSync fs file)
+      (.readFileSync fs file "utf8"))))
+
+(defn long-str [& strings] (clojure.string/join "\n" strings))
+
+(def PGN_TEST
+  (long-str "[Event \"Casual Game\"]"
+            "[Site \"Berlin GER\"]"
+            "[Date \"1852.??.??\"]"
+            "[EventDate \"?\"]"
+            "[Round \"?\"]"
+            "[Result \"1-0\"]"
+            "[White \"Adolf Anderssen\"]"
+            "[Black \"Jean Dufresne\"]"
+            "[ECO \"C52\"]"
+            "[WhiteElo \"?\"]"
+            "[BlackElo \"?\"]"
+            "[PlyCount \"47\"]"
+            ""
+            "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4 Bxb4 5.c3 Ba5 6.d4 exd4 7.O-O"
+            "d3 8.Qb3 Qf6 9.e5 Qg6 10.Re1 Nge7 11.Ba3 b5 12.Qxb5 Rb8 13.Qa4"
+            "Bb6 14.Nbd2 Bb7 15.Ne4 Qf5 16.Bxd3 Qh5 17.Nf6+ gxf6 18.exf6"
+            "Rg8 19.Rad1 Qxf3 20.Rxe7+ Nxe7 21.Qxd7+ Kxd7 22.Bf5+ Ke8"
+            "23.Bd7+ Kf8 24.Bxe7# 1-0"))
+
+(defn load-pgn [pgn]
+  (println "load-pgn: " pgn)
+  (.reset chess)
+  (.load_pgn chess pgn)
+  (println "FEN: " (.fen chess))
+  (.set chessground #js {
+                         :viewOnly true
+                         :autoCastle true
+                         :turnColor "white"
+                         :fen (.fen chess)
+                         :animation #js { :duration 500 }
+                         :drawable #js { :enabled true }
+                         }))
+
 ;; -------------------------
 ;; Views
 
@@ -62,15 +104,20 @@
 
 (defn atom-input [value]
   [:input {:field :file :type :file
+           :accept ".pgn"
            :value @value
-           :on-change #(reset! value (-> % .-target .-value))}])
+           :visible? false
+           :on-change (fn [val]
+                        (let [file (-> val .-target .-value)]
+                          (reset! value (-> val .-target .-value))
+                          (load-pgn (read-file file))))}])
 
 (defn shared-state []
-  (let [val (reagent/atom "foo")]
+  (let [val (reagent/atom "None")]
     (fn []
       [:div
-       [:p "The value is now: " @val]
-       [:p "Change it here: " [atom-input val]]])))
+       [:p "Selected file: " @val]
+       [atom-input val]])))
 
 (defn home-page []
   [:div

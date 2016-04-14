@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "finalhandler": "^0.4.1",
+    "fs": "0.0.2",
     "serve-static": "^1.10.2"
   }
 }
