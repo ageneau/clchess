@@ -104,7 +104,6 @@
 ;; -------------------------
 ;; Views
 
-
 (defn reset-button []
   [:input {:type "button" :value "Reset"
            :on-click #(reset-board)}])
@@ -117,18 +116,37 @@
 (defn update-games! [f & args]
   (apply swap! app-state update-in [:games] f args))
 
-(defn display-game-info [{:keys [wplayer bplayer] :as game}]
-  (str wplayer ", " bplayer))
+(defn display-game-info [{:keys [date result length wplayer bplayer welo belo move] :as game}]
+  (str date ", " wplayer ", " bplayer))
 
-(defn game [c]
-  [:li
-   [:span (display-game-info c)]])
+(defn game [{:keys [date result length wplayer bplayer welo belo move] :as game}]
+  [:tr
+   [:td date]
+   [:td result]
+   [:td length]
+   [:td wplayer]
+   [:td welo]
+   [:td bplayer]
+   [:td belo]
+   [:td move]])
 
 (defn game-list []
-  [:div
-   [:h1 "Game list"]
-   [:ul
+  [:table.table.table-striped.table-bordered
+   {:cell-spacing "0" :width "100%"}
+
+   [:thead>tr
+    [:th "Date"]
+    [:th "Result"]
+    [:th "Length"]
+    [:th "White"]
+    [:th "W-Elo"]
+    [:th "Black"]
+    [:th "B-Elo"]
+    [:th "Move"]]
+
+   [:tbody
     (for [c (:games @app-state)]
+      ^{:key (:id c)}
       [game c])]])
 
 (defn atom-input [value]

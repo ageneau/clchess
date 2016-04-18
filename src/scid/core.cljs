@@ -6,7 +6,8 @@
 (def *db-file* "/home/BIG/src/CHESS/scid-code/Blitz")
 
 (defn base-id []
-  (or (.base scid "slot" *db-file*)
+  (or (let [slot (.base scid "slot" *db-file*)]
+        (when ((complement zero?) slot) slot))
       (.base scid "open" *db-file*)))
 
 (defn test-scid []
@@ -25,7 +26,7 @@
 
 (defrecord GameInfo [id ; 723
                      result ; "1-0"
-                     nmoves ;10
+                     length ;10
                      wplayer ;"Nemenyi9999"
                      welo ; "1931"
                      bplayer ;"erikelrojo"
@@ -33,7 +34,7 @@
                      date ;"2014.01.15"
                      event ;
                      server ;
-                     pgn ;
+                     move ;
                      ])
 
 (defn game-list []
@@ -48,7 +49,7 @@
        ;; (723 "1-0" 10 "Nemenyi9999" "1931" "erikelrojo" "1854" "2014.01.15" "Live Chess" "?" "Chess.com" 0 0 0 " " "" "" "QRRBBNN6:QRRBBN7" " " "????.??.??" 2014 1892 27 "1.e4 e5  2.Nf3 Nc6  3.c3 Nf6  4.d4 Nxe4  5.d5 Nb8")
        (let [[id ; 723
               result ; "1-0"
-              nmoves ;10
+              length ;10
               wplayer ;"Nemenyi9999"
               welo ; "1931"
               bplayer ;"erikelrojo"
@@ -69,12 +70,12 @@
               _ ;
               _ ;
               _ ;
-              pgn ;
+              move ;
               :as game-info
               ] (array-seq game)]
          (map->GameInfo {:id id
                          :result result
-                         :nmoves nmoves
+                         :length length
                          :wplayer wplayer
                          :welo welo
                          :bplayer bplayer
@@ -82,7 +83,7 @@
                          :date date
                          :event event
                          :server server
-                         :pgn pgn})))
+                         :move move})))
      (->> (.base scid "gameslist" base-id start count filter-name sort-crit)
           array-seq
           (partition 3)))))
