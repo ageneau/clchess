@@ -2,7 +2,9 @@
     (:require [reagent.core :as reagent :refer [atom]]
               [reagent.session :as session]
               [secretary.core :as secretary :include-macros true]
-              [node-webkit.core :as nw]))
+              [node-webkit.core :as nw]
+              [clojure.string :as string]
+              [scid.core :as scid]))
 
 (enable-console-print!)
 
@@ -61,7 +63,7 @@
     (when (.existsSync fs file)
       (.readFileSync fs file "utf8"))))
 
-(defn long-str [& strings] (clojure.string/join "\n" strings))
+(defn long-str [& strings] (string/join "\n" strings))
 
 (def PGN_TEST
   (long-str "[Event \"Casual Game\"]"
@@ -107,6 +109,28 @@
   [:input {:type "button" :value "Reset"
            :on-click #(reset-board)}])
 
+(def app-state
+  (reagent/atom
+   {:games
+    (scid.core/game-list)}))
+
+(defn update-games! [f & args]
+  (apply swap! app-state update-in [:games] f args))
+
+(defn display-game-info [{:keys [wplayer bplayer] :as game}]
+  (str wplayer ", " bplayer))
+
+(defn game [c]
+  [:li
+   [:span (display-game-info c)]])
+
+(defn game-list []
+  [:div
+   [:h1 "Game list"]
+   [:ul
+    (for [c (:games @app-state)]
+      [game c])]])
+
 (defn atom-input [value]
   [:input {:field :file :type :file
            :accept ".pgn"
@@ -129,12 +153,18 @@
    [:div
     [:input {:type "button" :value "back"}]
     [:input {:type "button" :value "next"
-             :on-click #(let [move (js->clj (get (.history loaded-game #js {:verbose true}) current-ply))]
+             :on-click #(let [hist (.history loaded-game #js {:verbose true})
+                              move (js->clj (get hist current-ply))]
                           (println "From: " (move "from") " to:" (move "to"))
-                          (.move chessground (move "from") (move "to"))
-                          (set! current-ply (inc current-ply)))}]]
+                          (if (= current-ply (dec (count hist)))
+                            (js/alert "End of game")
+                            (do
+                              (.move chessground (move "from") (move "to"))
+                              (set! current-ply (inc current-ply))))
+                          )}]]
    [shared-state]
-   [reset-button]])
+   [reset-button]
+   [game-list]])
 
 
 ;; -------------------------
