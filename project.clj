@@ -14,11 +14,13 @@
                  [lein-figwheel "0.5.2"]
                  [org.clojure/tools.nrepl "0.2.12"]
                  [figwheel-sidecar "0.5.2"]
-                 [com.cemerick/piggieback "0.2.1"]]
+                 [com.cemerick/piggieback "0.2.1"]
+                 [garden "1.3.0"]]
 
   :plugins [[lein-cljsbuild "1.1.3"]
             [cider/cider-nrepl "0.12.0-SNAPSHOT"]
-            [lein-figwheel "0.5.2"]]
+            [lein-figwheel "0.5.2"]
+            [lein-garden "0.2.6"]]
 
   :min-lein-version "2.5.0"
 
@@ -37,6 +39,14 @@
                                         :optimizations :none
                                         :pretty-print  true
                                         :source-map true}}}}
+
+  :garden
+  {:builds
+   [{:id           "screen"
+     :source-paths ["src-clj"]
+     :stylesheet   reagent2.css/screen
+     :compiler     {:output-to     "public/css/compiled/screen.css"
+                    :pretty-print? true}}]}
 
   :figwheel {:http-server-root "public"
              :nrepl-port 7002
