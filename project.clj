@@ -18,7 +18,7 @@
                  [garden "1.3.0"]]
 
   :plugins [[lein-cljsbuild "1.1.3"]
-            [cider/cider-nrepl "0.12.0-SNAPSHOT"]
+            [cider/cider-nrepl "0.12.0"]
             [lein-figwheel "0.5.2"]
             [lein-garden "0.2.6"]]
 
