@@ -42,10 +42,10 @@
 
   :garden
   {:builds
-   [{:id           "screen"
+   [{:id           "clchess"
      :source-paths ["src/clj"]
-     :stylesheet   clchess.css/screen
-     :compiler     {:output-to     "public/css/compiled/screen.css"
+     :stylesheet   clchess.css/clchess
+     :compiler     {:output-to     "public/css/compiled/clchess.css"
                     :pretty-print? true}}]}
 
   :figwheel {:http-server-root "public"
