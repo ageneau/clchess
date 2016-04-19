@@ -15,7 +15,7 @@
 (def loaded-game (js/Chess.))
 (def current-ply 0)
 
-(def chessground (js/Chessground. (by-id "chessground-container")))
+(def *chessground*)
 
 (def SQUARES (.-SQUARES chess))
 
@@ -35,13 +35,13 @@
 (defn on-move [orig dest]
   (println "on-move: " orig "->" dest)
   (.move chess #js {:from orig :to dest})
-  (.set chessground #js {:turnColor (color) :movable #js {:color (color) :dests (dest-squares)}})
-  (println "board fen:" (.getFen chessground)))
+  (.set *chessground* #js {:turnColor (color) :movable #js {:color (color) :dests (dest-squares)}})
+  (println "board fen:" (.getFen *chessground*)))
 
 (defn reset-board []
   (println "reset-board")
   (.reset chess)
-  (.set chessground #js {
+  (.set *chessground* #js {
                          :viewOnly false
                          :autoCastle true
                          :turnColor "white"
@@ -92,7 +92,7 @@
   (.reset loaded-game)
   (.load_pgn loaded-game pgn)
   (println "FEN: " (.fen loaded-game))
-  (.set chessground #js {
+  (.set *chessground* #js {
                          :viewOnly true
                          :autoCastle true
                          :turnColor "white"
@@ -168,6 +168,7 @@
 
 (defn home-page []
   [:div
+   [:div {:class "chessground normal wood cburnett" :id "chessground-container"}]
    [:div
     [:input {:type "button" :value "back"}]
     [:input {:type "button" :value "next"
@@ -177,7 +178,7 @@
                           (if (= current-ply (dec (count hist)))
                             (js/alert "End of game")
                             (do
-                              (.move chessground (move "from") (move "to"))
+                              (.move *chessground* (move "from") (move "to"))
                               (set! current-ply (inc current-ply))))
                           )}]]
    [shared-state]
@@ -195,5 +196,6 @@
   (nw/menubar! [{:label "File"
                  :submenu (nw/menu [{:label "Quit"
                                      :click nw/quit}])}])
-  (reset-board)
-  (mount-root))
+  (mount-root)
+  (set! *chessground* (js/Chessground. (by-id "chessground-container")))
+  (reset-board))
