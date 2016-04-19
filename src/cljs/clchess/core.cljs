@@ -130,19 +130,20 @@
    [:td belo]
    [:td move]])
 
-(defn game-list []
-  [:table.table.table-striped.table-bordered
-   {:cell-spacing "0" :width "100%"}
+(defn test-list []
+  [:div {:id "test-list"} "TEST"])
 
-   [:thead>tr
-    [:th "Date"]
-    [:th "Result"]
-    [:th "Length"]
-    [:th "White"]
-    [:th "W-Elo"]
-    [:th "Black"]
-    [:th "B-Elo"]
-    [:th "Move"]]
+(defn game-list []
+  [:table {:id "game-list"}
+   [:thead
+    [:th {:class "date"} "Date"]
+    [:th {:class "result"} "Result"]
+    [:th {:class "length"} "Length"]
+    [:th {:class "player-name"} "White"]
+    [:th {:class "player-elo"} "W-Elo"]
+    [:th {:class "player-name"} "Black"]
+    [:th {:class "player-elo"} "B-Elo"]
+    [:th {:class "move-list"} "Move"]]
 
    [:tbody
     (for [c (:games @app-state)]
@@ -150,10 +151,11 @@
       [game c])]])
 
 (defn atom-input [value]
-  [:input {:field :file :type :file
+  [:input {:field :file
+           :type :file
            :accept ".pgn"
            :value @value
-           :visible? false
+           :id "file-selector"
            :on-change (fn [val]
                         (let [file (-> val .-target .-value)]
                           (reset! value (-> val .-target .-value))
@@ -166,10 +168,11 @@
        [:p "Selected file: " @val]
        [atom-input val]])))
 
-(defn home-page []
-  [:div
-   [:div {:class "chessground normal wood cburnett" :id "chessground-container"}]
-   [:div
+(defn chessboard []
+  [:div {:class "chessground normal wood cburnett" :id "chessground-container"}])
+
+(defn controls []
+  [:div {:id "controls"}
     [:input {:type "button" :value "back"}]
     [:input {:type "button" :value "next"
              :on-click #(let [hist (.history loaded-game #js {:verbose true})
@@ -180,11 +183,16 @@
                             (do
                               (.move *chessground* (move "from") (move "to"))
                               (set! current-ply (inc current-ply))))
-                          )}]]
-   [shared-state]
-   [reset-button]
-   [game-list]])
+                          )}]
+    [shared-state]
+    [reset-button]])
 
+(defn home-page []
+  [:div {:id "page-container"}
+   [:div {:id "chessboard-and-controls"}
+    [chessboard]
+    [controls]]
+   [:div {:id "game-list-container"} [game-list]]])
 
 ;; -------------------------
 ;; Initialize app
@@ -194,7 +202,10 @@
 
 (defn init! []
   (nw/menubar! [{:label "File"
-                 :submenu (nw/menu [{:label "Quit"
+                 :submenu (nw/menu [{:label "Open"
+                                     :click #(let [selector (.getElementById js/document "file-selector")]
+                                               (.click selector))}
+                                    {:label "Quit"
                                      :click nw/quit}])}])
   (mount-root)
   (set! *chessground* (js/Chessground. (by-id "chessground-container")))
