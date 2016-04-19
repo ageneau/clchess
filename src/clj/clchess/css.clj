@@ -1,4 +1,4 @@
-(ns reagent2.css
+(ns clchess.css
     (:require [garden.def :refer [defstyles]]))
 
 (defstyles screen

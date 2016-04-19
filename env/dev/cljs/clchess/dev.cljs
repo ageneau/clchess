@@ -1,5 +1,5 @@
-(ns ^:figwheel-no-load reagent2.dev
-  (:require [reagent2.core :as core]
+(ns ^:figwheel-no-load clchess.dev
+  (:require [clchess.core :as core]
             [figwheel.client :as figwheel :include-macros true]))
 
 (enable-console-print!)

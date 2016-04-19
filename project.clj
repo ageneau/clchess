@@ -1,4 +1,4 @@
-(defproject reagent2 "0.1.0-SNAPSHOT"
+(defproject clchess "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -31,8 +31,8 @@
 
   :resource-paths ["public"]
 
-  :cljsbuild {:builds {:app {:source-paths ["src" "env/dev/cljs"]
-                             :compiler {:main "reagent2.dev"
+  :cljsbuild {:builds {:app {:source-paths ["src/cljs" "env/dev/cljs"]
+                             :compiler {:main "clchess.dev"
                                         :output-to "public/js/app.js"
                                         :output-dir "public/js/out"
                                         :asset-path   "js/out"
@@ -43,8 +43,8 @@
   :garden
   {:builds
    [{:id           "screen"
-     :source-paths ["src-clj"]
-     :stylesheet   reagent2.css/screen
+     :source-paths ["src/clj"]
+     :stylesheet   clchess.css/screen
      :compiler     {:output-to     "public/css/compiled/screen.css"
                     :pretty-print? true}}]}
 

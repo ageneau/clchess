@@ -1,5 +1,5 @@
-(ns reagent2.prod
-  (:require [reagent2.core :as core]))
+(ns clchess.prod
+  (:require [clchess.core :as core]))
 
 ;;ignore println statements in prod
 (set! *print-fn* (fn [& _]))
