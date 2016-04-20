@@ -11,6 +11,7 @@
                  [reagent-utils "0.1.7"]
                  [secretary "1.2.3"]
                  [prone "1.1.0"]
+                 [com.taoensso/timbre "4.3.1"]
                  [lein-figwheel "0.5.2"]
                  [org.clojure/tools.nrepl "0.2.12"]
                  [figwheel-sidecar "0.5.2"]

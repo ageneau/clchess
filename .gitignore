@@ -16,3 +16,9 @@ pom.xml.asc
 node_modules
 public/js/app.js
 *~
+.cljs_rhino_repl/
+public/build
+public/css/compiled/
+public/js/out/
+*.pgn
+

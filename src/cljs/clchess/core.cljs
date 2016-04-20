@@ -4,9 +4,9 @@
               [secretary.core :as secretary :include-macros true]
               [node-webkit.core :as nw]
               [clojure.string :as string]
-              [scid.core :as scid]
               [clchess.utils :as utils]
-              [clchess.board :as board]))
+              [clchess.board :as board]
+              [taoensso.timbre :as timbre]))
 
 (enable-console-print!)
 
@@ -28,8 +28,11 @@
 (defn display-game-info [{:keys [date result length wplayer bplayer welo belo move] :as game}]
   (str date ", " wplayer ", " bplayer))
 
-(defn game [{:keys [date result length wplayer bplayer welo belo move] :as game}]
+(defn game [{:keys [id date result length wplayer bplayer welo belo move] :as game}]
   [:tr
+   {:on-click #(->>
+                (js/alert (str "Selected game: " id))
+                (js/alert (str "Selected game: " wplayer " - " bplayer)))}
    [:td date]
    [:td result]
    [:td length]
@@ -41,7 +44,7 @@
 
 (defn game-list []
   [:table {:id "game-list"}
-   [:thead
+   [:thead>tr
     [:th {:class "date"} "Date"]
     [:th {:class "result"} "Result"]
     [:th {:class "length"} "Length"]
@@ -81,7 +84,7 @@
   [:div {:id "controls"}
     [:input {:type "button" :value "back"}]
     [:input {:type "button" :value "next"
-             :on-click board/next-move}]
+             :on-click #(board/next-move)}]
     [selected-file]
     [reset-button]])
 
