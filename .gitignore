@@ -15,3 +15,4 @@ pom.xml.asc
 /.env
 node_modules
 public/js/app.js
+*~
