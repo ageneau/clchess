@@ -101,6 +101,11 @@
 (defn mount-root []
   (reagent/render [home-page] (utils/by-id "app")))
 
+(defn reset-page []
+  (mount-root)
+  (board/init-board)
+  (board/reset-board))
+
 (defn init! []
   (nw/menubar! [{:label "File"
                  :submenu (nw/menu [{:label "Open"
