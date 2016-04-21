@@ -1,6 +1,6 @@
 {
   "name": "chess",
-  "main": "public/index.html",
+  "main": "resources/public/index.html",
   "version": "0.1.0",
   "window": {
     "title": "chess",

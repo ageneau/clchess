@@ -30,12 +30,12 @@
    [:cljsbuild :builds :app :compiler :output-dir]
    [:cljsbuild :builds :app :compiler :output-to]]
 
-  :resource-paths ["public"]
+  :resource-paths ["resources/public"]
 
   :cljsbuild {:builds {:app {:source-paths ["src/cljs" "env/dev/cljs"]
                              :compiler {:main "clchess.dev"
-                                        :output-to "public/js/app.js"
-                                        :output-dir "public/js/out"
+                                        :output-to "resources/public/js/app.js"
+                                        :output-dir "resources/public/js/out"
                                         :asset-path   "js/out"
                                         :optimizations :none
                                         :pretty-print  true
@@ -46,10 +46,9 @@
    [{:id           "clchess"
      :source-paths ["src/clj"]
      :stylesheet   clchess.css/clchess
-     :compiler     {:output-to     "public/css/compiled/clchess.css"
+     :compiler     {:output-to     "resources/public/css/compiled/clchess.css"
                     :pretty-print? true}}]}
 
-  :figwheel {:http-server-root "public"
-             :nrepl-port 7002
+  :figwheel {:nrepl-port 7002
              :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"]
-             :css-dirs ["public/css"]})
+             :css-dirs ["resources/public/css"]})

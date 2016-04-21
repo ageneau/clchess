@@ -8,7 +8,6 @@ pom.xml.asc
 *.class
 /.lein-*
 /.nrepl-port
-/resources/public/js
 /out
 /.repl
 *.log
@@ -17,8 +16,8 @@ node_modules
 public/js/app.js
 *~
 .cljs_rhino_repl/
-public/build
-public/css/compiled/
-public/js/out/
+/resources/public/build
+/resources/public/css/compiled/
+/resources/public/js/out/
 *.pgn
 
