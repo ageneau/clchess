@@ -5,24 +5,47 @@
 (def scid (js/require "./build/Debug/scid"))
 (def *db-file* "/home/BIG/src/CHESS/scid-code/Blitz")
 
+(defprotocol Base
+  (open [this fn])
+  (slot [this fn]))
+
+(defprotocol Game
+  (number [this])
+  (load [this game-number])
+  (pgn [this])
+  (tag [this]))
+
+(deftype Scid [scid]
+  Game
+  (number [this]
+    (.game scid "number"))
+  (pgn [this]
+    (.game scid
+           "pgn"
+           "-symbols" "1"
+           "-indentVar" "1"
+           "-indentCom" "1"
+           "-space" "0"
+           "-format" "color"
+           "-column" "0"
+           "-short" "1"
+           "-markCodes" "0"))
+  (tag [this]
+    (.game scid "tag" "get" "Extra"))
+  (load [this game-number]
+    (.game scid "load" number))
+  Base
+  (open [this fn]
+    (.base scid "open" fn))
+  (slot [this fn]
+    (.base scid "slot" fn)))
+
+(def *scid* (->Scid scid))
+
 (defn base-id []
-  (or (let [slot (.base scid "slot" *db-file*)]
+  (or (let [slot (slot *scid* *db-file*)]
         (when ((complement zero?) slot) slot))
-      (.base scid "open" *db-file*)))
-
-(defn test-scid []
-  (let [base-id (base-id)
-        num-games (.base scid "numGames" base-id)]
-    (println "BaseId: " base-id)
-    (println "NumGames: " num-games)
-
-    (.base scid "sortcache" base-id "create" "i-d-")
-    (let [start 0
-          count 11
-          filter-name "dbfilter"
-          sort-crit "i-d-"
-          game-list (.base scid "gameslist" base-id start count filter-name sort-crit)]
-      (println "Game list:" (js->clj game-list)))))
+      (open *scid* *db-file*)))
 
 (defrecord GameInfo [id ; 723
                      result ; "1-0"

@@ -30,7 +30,7 @@
 
 (defn game [{:keys [id date result length wplayer bplayer welo belo move] :as game}]
   [:tr
-   {:on-click #(->>
+   {:on-click #(do
                 (js/alert (str "Selected game: " id))
                 (js/alert (str "Selected game: " wplayer " - " bplayer)))}
    [:td date]
