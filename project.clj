@@ -7,23 +7,26 @@
   :min-lein-version "2.6.1"
 
   :dependencies [[org.clojure/clojure "1.8.0" :scope "provided"]
-                 [org.clojure/clojurescript "1.8.40" :scope "provided"]
+                 [org.clojure/clojurescript "1.8.51" :scope "provided"]
+                 [org.clojure/core.async "0.2.374"]
                  [reagent "0.5.1"]
-                 [reagent-forms "0.5.22"]
-                 [reagent-utils "0.1.7"]
+                 [reagent-forms "0.5.23"]
+                 [reagent-utils "0.1.8"]
                  [secretary "1.2.3"]
-                 [prone "1.1.0"]
+                 [prone "1.1.1"]
                  [com.taoensso/timbre "4.3.1"]
                  [lein-figwheel "0.5.2"]
                  [org.clojure/tools.nrepl "0.2.12"]
                  [figwheel-sidecar "0.5.2"]
                  [com.cemerick/piggieback "0.2.1"]
-                 [garden "1.3.0"]]
+                 [garden "1.3.2"]
+                 [jamesmacaulay/cljs-promises "0.1.0"]]
 
   :plugins [[lein-cljsbuild "1.1.3"]
             [cider/cider-nrepl "0.12.0"]
             [lein-figwheel "0.5.2"]
-            [lein-garden "0.2.6"]]
+            [lein-garden "0.2.6"]
+            [lein-ancient "0.6.10"]]
 
   :clean-targets ^{:protect false}
   ["resources/public/js/compiled"
