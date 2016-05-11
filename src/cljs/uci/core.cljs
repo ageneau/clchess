@@ -1,18 +1,16 @@
-(ns clchess.uci
-  (:require-macros [cljs.core.async.macros :refer [go]])
+(ns uci.core
+  (:require-macros
+   [uci.macros :refer [inspect breakpoint]]
+   [cljs.core.async.macros :refer [go]])
   (:require [cljs-promises.core :as p]
             [cljs-promises.async :refer [pair-port] :refer-macros [<?]]
-            [cljs.core.async :refer [put! chan <!]]))
+            [cljs.core.async :refer [put! chan <!]]
+            [uci.utils :as utils]))
 
 (def uci (js/require "uci"))
 (def *engine* (new uci "/usr/games/stockfish"))
 
 ;; (cljs-promises.async/extend-promises-as-pair-channels!)
-
-(defn pdelay [promise ms]
-  (p/then (p/timeout ms)
-          (fn []
-            promise)))
 
 (defn run-engine []
   (let [engine *engine*
@@ -37,12 +35,15 @@
                     (.goInfiniteCommand engine
                                         (fn [info]
                                           (println info)))))
-          (pdelay 2000)
+          (utils/pdelay 4000)
           (p/then (fn []
-                    (println "Stopping analysis")
-                    (.stopCommand engine)))
+                    (let [stop (.stopCommand engine)]
+                      (println "Stopping analysis: " stop)
+                      (inspect stop)
+                      stop)))
           (p/then (fn [bestmove]
-                    (println "Best move:" (js->clj bestmove))
+                    (println "Best move:" (utils/jsx->clj bestmove))
+                    (inspect bestmove)
                     (.quitCommand engine)))
           (p/then (fn []
                     (println "Stopped"))))

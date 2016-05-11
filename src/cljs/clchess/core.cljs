@@ -6,6 +6,7 @@
               [clojure.string :as string]
               [clchess.utils :as utils]
               [clchess.board :as board]
+              [uci.core :as uci]
               [taoensso.timbre :as timbre]))
 
 (enable-console-print!)
@@ -16,6 +17,10 @@
 (defn reset-button []
   [:input {:type "button" :value "Reset"
            :on-click #(board/reset-board)}])
+
+(defn start-engine-button []
+  [:input {:type "button" :value "Start engine"
+           :on-click #(uci/run-engine)}])
 
 (def app-state
   (reagent/atom
@@ -82,11 +87,12 @@
 
 (defn controls []
   [:div {:id "controls"}
-    [:input {:type "button" :value "back"}]
-    [:input {:type "button" :value "next"
-             :on-click #(board/next-move)}]
-    [selected-file]
-    [reset-button]])
+   [:input {:type "button" :value "back"}]
+   [:input {:type "button" :value "next"
+            :on-click #(board/next-move)}]
+   [selected-file]
+   [reset-button]
+   [start-engine-button]])
 
 (defn home-page []
   [:div {:id "page-container"}

@@ -17,5 +17,5 @@ node_modules
 .cljs_rhino_repl/
 /resources/public/build
 /resources/public/css/compiled/
-/resources/public/js/out/
+/resources/public/js/compiled/
 *.pgn
