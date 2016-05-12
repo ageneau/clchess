@@ -1,21 +1,29 @@
-
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <link rel="stylesheet" href="css/compiled/clchess.css">
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/theme.css">
-    <link rel="stylesheet" href="css/desktop.css">
-  </head>
-  <body>
-    <script src="js/chessground.js" type="text/javascript"></script>
-    <script src="js/chess.js" type="text/javascript"></script>
-    <div id="app">
-      <h3>ClojureScript has not been compiled!</h3>
-      <p>please run <b>lein figwheel</b> in order to start the compiler</p>
-    </div>
-    <script src="js/compiled/clchess.js" type="text/javascript"></script>
-  </body>
+    <head>
+        <meta charset="utf-8">
+        <meta content="width=device-width, initial-scale=1" name="viewport">
+        <link rel="stylesheet" href="lila/public/stylesheets/dark.css">
+        <link rel="stylesheet" href="lila/public/stylesheets/transp.css">
+        <link rel="stylesheet" href="lila/public/stylesheets/common.css">
+        <link rel="stylesheet" href="lila/public/stylesheets/board.css">
+        <link id="piece-sprite" href="lila/public/stylesheets/piece/cburnett.css" type="text/css" rel="stylesheet">
+        <link rel="stylesheet" href="css/compiled/clchess.css">
+        <link href="lila/public/stylesheets/board-3d.css" type="text/css" rel="stylesheet">
+        <!-- <link id="piece-sprite" href="lila/public/stylesheets/piece/companion.css" type="text/css" rel="stylesheet"> -->
+        <!-- <link rel="stylesheet" href="css/compiled/clchess.css">
+             <link rel="stylesheet" href="css/base.css">
+             <link rel="stylesheet" href="css/theme.css">
+             <link rel="stylesheet" href="css/desktop.css"> -->
+    </head>
+    <body class="preload base highlight destination coords_2"
+          data-piece-set="cburnett">
+        <script src="js/chessground.js" type="text/javascript"></script>
+        <script src="js/chess.js" type="text/javascript"></script>
+        <div id="app">
+            <h3>ClojureScript has not been compiled!</h3>
+            <p>please run <b>lein figwheel</b> in order to start the compiler</p>
+        </div>
+        <script src="js/compiled/clchess.js" type="text/javascript"></script>
+    </body>
 </html>

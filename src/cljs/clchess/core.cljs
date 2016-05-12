@@ -2,10 +2,15 @@
     (:require [reagent.core :as reagent :refer [atom]]
               [reagent.session :as session]
               [secretary.core :as secretary :include-macros true]
+              [goog.dom :as dom]
+              [goog.dom.classlist :as classlist]
+              [goog.events :as events]
               [node-webkit.core :as nw]
               [clojure.string :as string]
               [clchess.utils :as utils]
               [clchess.board :as board]
+              [clchess.theme :as theme]
+              [clchess.widgets :as widgets]
               [uci.core :as uci]
               [taoensso.timbre :as timbre]))
 
@@ -24,8 +29,11 @@
 
 (def app-state
   (reagent/atom
-   {:games
-    (scid.core/game-list)}))
+   {:games (scid.core/game-list)
+    :is-2d true
+    :theme "dark"
+    :data-theme "brown"
+    :zoom "80%"}))
 
 (defn update-games! [f & args]
   (apply swap! app-state update-in [:games] f args))
@@ -83,7 +91,31 @@
        [file-input val]])))
 
 (defn chessboard []
-  [:div {:class "chessground normal wood cburnett" :id "chessground-container"}])
+  [:div {:class "lichess_board_wrap cg-512"}
+   [:div {:class "lichess_board standard"}
+    [:div {:id "chessground-container"}]]])
+
+(defn top-menu []
+  [:div {:class "hover" :id "topmenu"}
+   [:section
+    [:a "Play"]
+    [:div
+     [:a "Create a game"]
+     [:a "Tournament"]
+     [:a "Simultaneous exhibitions"]]]
+   [:section
+    [:a "Learn"]
+    [:div
+     [:a "Training"]
+     [:a "Openings"]
+     [:a "Coordinates"]]]])
+
+(defn top-section []
+  [:div {:class (if (@theme/theme-state :is-2d) "is2d" "is3d") :id "top"}
+   [top-menu]
+   [widgets/hamburger]
+   [theme/theme-selector]
+   ])
 
 (defn controls []
   [:div {:id "controls"}
@@ -96,13 +128,19 @@
 
 (defn home-page []
   [:div {:id "page-container"}
+   [top-section]
+   [:div {:class (if (@theme/theme-state :is-2d) "is2d" "is3d") :id "content"}
+    [chessboard]]
    [:div {:id "chessboard-and-controls"}
-    [chessboard]
-    [controls]]
-   [:div {:id "game-list-container"} [game-list]]])
+    ;; [chessboard]
+    ;; [controls]
+    ]
+   ;; [:div {:id "game-list-container"} [game-list]]
+   ])
 
 ;; -------------------------
 ;; Initialize app
+;; -------------------------
 
 (defn mount-root []
   (reagent/render [home-page] (utils/by-id "app")))
@@ -113,12 +151,13 @@
   (board/reset-board))
 
 (defn init! []
-  (nw/menubar! [{:label "File"
-                 :submenu (nw/menu [{:label "Open"
-                                     :click #(let [selector (utils/by-id "file-selector")]
-                                               (.click selector))}
-                                    {:label "Quit"
-                                     :click nw/quit}])}])
+  ;; (nw/menubar! [{:label "File"
+  ;;                :submenu (nw/menu [{:label "Open"
+  ;;                                    :click #(let [selector (utils/by-id "file-selector")]
+  ;;                                              (.click selector))}
+  ;;                                   {:label "Quit"
+  ;;                                    :click nw/quit}])}])
+  (theme/init-theme)
   (mount-root)
   (board/init-board)
   (board/reset-board))

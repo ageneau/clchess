@@ -8,21 +8,6 @@
 
 
 (defstyles clchess
-  [:* {:box-sizing "border-box"}]
-  [:body {:text-align "center"
-          :color "#333"
-          :line-height "1.5em"
-          :-webkit-font-smoothing "antialiased"
-          :margin "0 auto"}]
-  [:h1 :h2 :h3 {:color "#000"}]
-  [:h1 {:font-size "2.5em"}]
-  [:h2 {:font-size "2em"}]
-  [:h3 {:font-size "1.5em"}]
-  [:p {:margin "0 auto"}]
-  [:a {:text-decoration "none"
-       :color "#09f"}]
-  [:a:hover {:text-decoration "underline"}]
-
   [(s/input (type= "file")) {:display "none"}]
 
   [:.chessground {:background "#404040"
@@ -48,10 +33,8 @@
   [:.cg-board-wrap [:svg [:* {:transition "0.35s"}]]]
   [:th :tr {:text-align "left"
             :overflow "hidden" }]
-  [:#page-container {:text-align "center"
-                     :margin "0 auto"
-                     :width "100%"
-                     :height "100%"}]
+  [:#page-container {}]
+  [:#content {:margin "35px auto 30px auto"}]
   [:#chessboard-and-controls {:float "left"
                               :text-align "center"
                               :display "inline-block"

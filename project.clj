@@ -34,6 +34,7 @@
    "target"]
 
   :resource-paths ["resources/public"]
+  :source-paths ["src/cljs" "env/dev/cljs"]
 
   :cljsbuild {:builds
               [{:id "dev"
