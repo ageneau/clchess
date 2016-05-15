@@ -1,5 +1,6 @@
 (ns clchess.theme
   (:require [reagent.core :as reagent :refer [atom]]
+            [re-frame.core :refer [subscribe dispatch dispatch-sync]]
             [goog.dom :as dom]
             [goog.dom.classlist :as classlist]
             [goog.events :as events]
@@ -67,17 +68,16 @@
         (classlist/removeAll (utils/body) (clj->js data-sets-3d))
         (classlist/add (utils/body) new-set)))))
 
-(defn init-theme []
-  (let [theme @theme-state]
-    (log/info "init-theme:" theme)
-    (switch-theme! (:name (theme :theme)))
-    (if (theme :is-2d)
-      (do
-        (switch-data-theme! (theme :data-theme))
-        (switch-data-set! (theme :data-set) {:is-2d true}))
-      (do
-        (switch-data-theme! (theme :data-theme-3d))
-        (switch-data-set! (theme :data-set-3d) {:is-2d false})))))
+(defn init-theme [theme]
+  (log/info "init-theme:" theme)
+  (switch-theme! (:name theme))
+  (if (:is-2d theme)
+    (do
+      (switch-data-theme! (:data-theme theme))
+      (switch-data-set! (:data-set theme) {:is-2d true}))
+    (do
+      (switch-data-theme! (:data-theme-3d theme))
+      (switch-data-set! (:data-set-3d theme) {:is-2d false}))))
 
 (defn board-selector [{:keys [is-2d]}]
   (let [data-themes (if is-2d data-themes data-themes-3d)]
@@ -113,38 +113,41 @@
                          (js/info "Background:" %1)
                          (swap! theme-state assoc :background-img %1))}])
 
-(defn theme-selector-dropdown []
-  [:div {:class "dropdown"
-         :data-themes (string/join " " data-themes)
-         :data-theme3ds (string/join " " data-themes-3d)
-         :data-sets (string/join " " data-sets)
-         :data-set3ds (string/join " " data-sets-3d)}
-   [widgets/simple-toggle themes {:container-class "background"
-                                  :on-toggle #(switch-theme! (:name %1))
-                                  :initial-value (:theme @theme-state)}]
-   (let [options [{:name "d2" :text "2D"}
-                  {:name "d3" :text "3D"}]
-         current (if (:is-2d @theme-state) (first options) (second options))]
-     [widgets/simple-toggle
-      options
-      {:container-class "dimensions"
-       :on-toggle #(let [new-val (= "d2" (%1 :name))]
-                     (log/info "Switch:" %1)
-                     (swap! theme-state assoc :is-2d new-val)
-                     (init-theme))
-       :initial-value current}])
+(defn theme-selector-dropdown [theme]
+  (fn [theme]
+    (log/info "theme-selector-dropdown")
+    [:div {:class "dropdown"
+           :data-themes (string/join " " data-themes)
+           :data-theme3ds (string/join " " data-themes-3d)
+           :data-sets (string/join " " data-sets)
+           :data-set3ds (string/join " " data-sets-3d)}
+     [widgets/simple-toggle themes {:container-class "background"
+                                    :on-toggle #(switch-theme! (:name %1))
+                                    :initial-value (:theme @theme-state)}]
+     (let [options [{:name "d2" :text "2D"}
+                    {:name "d3" :text "3D"}]
+           current (if (:is-2d theme) (first options) (second options))]
+       [widgets/simple-toggle
+        options
+        {:container-class "dimensions"
+         :on-toggle #(let [new-val (= "d2" (%1 :name))]
+                       (log/info "Switch dim:" new-val)
+                       (dispatch-sync [:set-is-2d  new-val])
+                       (let [theme (assoc theme :is-2d new-val)]
+                         (init-theme theme)))
+         :initial-value current}])
    
-   [background-input]
-   ;; (widgets/slider (:zoom theme-state))
-   (let [is-2d (@theme-state :is-2d)
-         div-class (if is-2d "is2d" "is3d")]
-     [:div {:class div-class}
-      [board-selector {:is-2d is-2d}]
-      [piece-selector {:is-2d is-2d}]])])
+     [background-input]
+     ;; (widgets/slider (:zoom theme-state))
+     (let [div-class (if (:is-2d theme) "is2d" "is3d")]
+       [:div {:class div-class}
+        [board-selector {:is-2d (:is-2d theme)}]
+        [piece-selector {:is-2d (:is-2d theme)}]])]))
 
-(defn theme-selector []
+(defn theme-selector [theme]
   (let [shown (reagent/atom false)]
-    (fn []
+    (fn [theme]
+      (log/info "theme-selector")
       (let [is-shown @shown
             toggle [:a {:id "themepicker_toggle"
                         :class "toggle icon link hint--bottom-left"
@@ -157,6 +160,6 @@
         (if is-shown
           [:div {:id "themepicker" :class "fright shown"}
            toggle
-           [theme-selector-dropdown]]
+           [theme-selector-dropdown theme]]
           [:div {:id "themepicker" :class "fright"}
            toggle])))))

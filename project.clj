@@ -12,6 +12,7 @@
                  [reagent "0.5.1"]
                  [reagent-forms "0.5.23"]
                  [reagent-utils "0.1.8"]
+                 [re-frame "0.7.0"]
                  [secretary "1.2.3"]
                  [prone "1.1.1"]
                  [com.taoensso/timbre "4.3.1"]
@@ -20,7 +21,8 @@
                  [figwheel-sidecar "0.5.3-1"]
                  [com.cemerick/piggieback "0.2.1"]
                  [garden "1.3.2"]
-                 [jamesmacaulay/cljs-promises "0.1.0"]]
+                 [jamesmacaulay/cljs-promises "0.1.0"]
+                 [prismatic/schema "1.0.3"]]
 
   :plugins [[lein-cljsbuild "1.1.3"]
             [cider/cider-nrepl "0.12.0"]

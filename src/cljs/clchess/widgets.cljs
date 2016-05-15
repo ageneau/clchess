@@ -92,6 +92,7 @@
     [:th {:colSpan "4"} "top games"]]
    [:tbody
     (for [game (scid.core/game-list)]
+      ^ { :key (:id game)}
       [game-row game])]])
 
 (defn explorer-box []

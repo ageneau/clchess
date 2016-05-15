@@ -1,7 +1,7 @@
 (ns clchess.board
     (:require [scid.core :as scid]
               [clchess.utils :as utils]
-              [taoensso.timbre :as timbre]))
+              [taoensso.timbre :as log]))
 
 (def chess (js/Chess.))
 (def loaded-game (js/Chess.))
@@ -25,16 +25,16 @@
   (clj->js (reduce merge (map moves SQUARES))))
 
 (defn on-move [orig dest]
-  (timbre/info "on-move: " orig "->" dest)
+  (log/info "on-move: " orig "->" dest)
   (.move chess #js {:from orig :to dest})
   (.set *chessground* #js {:turnColor (color) :movable #js {:color (color) :dests (dest-squares)}})
-  (timbre/info "board fen:" (.getFen *chessground*)))
+  (log/info "board fen:" (.getFen *chessground*)))
 
 (defn init-board []
   (set! *chessground* (js/Chessground. (utils/by-id "chessground-container"))))
 
 (defn reset-board []
-  (timbre/info "reset-board")
+  (log/info "reset-board")
   (.reset chess)
   (.set *chessground* #js {
                          :viewOnly false
@@ -54,12 +54,12 @@
 
 
 (defn load-pgn [pgn]
-  (timbre/info "load-pgn: " pgn)
+  (log/info "load-pgn: " pgn)
   (set! current-ply 0)
   (.reset chess)
   (.reset loaded-game)
   (.load_pgn loaded-game pgn)
-  (timbre/info "FEN: " (.fen loaded-game))
+  (log/info "FEN: " (.fen loaded-game))
   (.set *chessground* #js {
                          :viewOnly true
                          :autoCastle true
@@ -72,7 +72,7 @@
 (defn next-move []
   (let [hist (.history loaded-game #js {:verbose true})
       move (js->clj (get hist current-ply))]
-  (timbre/info "From: " (move "from") " to:" (move "to"))
+  (log/info "From: " (move "from") " to:" (move "to"))
   (if (= current-ply (dec (count hist)))
     (js/alert "End of game")
     (do
