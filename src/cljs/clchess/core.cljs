@@ -130,7 +130,14 @@
   [:div {:id "page-container"}
    [top-section]
    [:div {:class (if (@theme/theme-state :is-2d) "is2d" "is3d") :id "content"}
-    [chessboard]]
+    [:div {:class "lichess_game"}
+     [chessboard]
+     [:div {:class "lichess_ground"}
+      [widgets/ceval-box]
+      [widgets/opening-box]
+      [widgets/replay]
+      [widgets/explorer-box]
+      [widgets/game-controls]]]]
    [:div {:id "chessboard-and-controls"}
     ;; [chessboard]
     ;; [controls]
