@@ -4,7 +4,7 @@
               [goog.dom.classlist :as classlist]
               [goog.events :as events]
               [clojure.string :as string]
-              [clchess.utils :as utils]
+              [clchess.utils :as utils :refer [percent-string]]
               [taoensso.timbre :as log]))
 
 
@@ -47,37 +47,59 @@
    [:svg {:viewBox "0 0 40 40"}
     [:circle {:cx "20" :cy "20" :r "18" :fill "none"}]]])
 
-(defn explorer-box []
-  [:div {:class "explorer_box"}
-   ;; [spinner]
-   [:div {:class "data"}
-    [:table {:class "moves"}
+(defn move-row [{:keys [move games white draw black rating]}]
+  [:tr {;; :data-uci "b1c3"
+        :title (str "Average rating: " rating)}
+       [:td move]
+       [:td games]
+       [:td [:div {:class "bar"}
+             [:span {:class "white" :style {:width (percent-string white)}} (percent-string white :round true)]
+             [:span {:class "draws" :style {:width (percent-string draw)}} (percent-string draw :round true)]
+             [:span {:class "black" :style {:width (percent-string black)}} (percent-string black :round true)]]]])
+
+(defn move-table []
+  [:table {:class "moves"}
      [:thead>tr
       [:th "Move"]
       [:th "Games"]
       [:th "White / Draw / Black"]]
      [:tbody
-      [:tr {:data-uci "b1c3" :title "Average rating: 2489"}
-       [:td "Nc3"]
-       [:td "358"]
-       [:td [:div {:class "bar"}
-             [:span {:class "white" :style {:width "39.4%"}} "39%"]
-             [:span {:class "draws" :style {:width "34.4%"}} "34%"]
-             [:span {:class "black" :style {:width "26.3%"}} "26%"]]]]]]
-    [:table {:class "games"}
-     [:thead>tr
-      [:th {:colSpan "4"} "top games"]]
-     [:tbody
-      [:tr
-       [:td [:span "2778"] [:span "2843"]]
-       [:td [:span "Karjakin, Sergey"][:span "Carlsen, Magnus"]]
-       [:td [:result {:class "draws"} "½-½"]]
-       [:td "2012"]]
-      [:tr
-       [:td [:span "2773"] [:span "2843"]]
-       [:td [:span "Karjakin, Sergey"][:span "Carlsen, Magnus"]]
-       [:td [:result {:class "white"} "1-0"]]
-       [:td "2012"]]]]]])
+      [move-row {:move "Nc3" :games 358 :white 39.4 :draw 34.4 :black 26.3 :rating 2489}]
+      [move-row {:move "Nd2" :games 244 :white 37.6 :draw 40 :black 22.4 :rating 2457}]]])
+
+(defn printable-result [result]
+  (case result
+    "1-0" "1-0"
+    "0-1" "0-1"
+    "=-=" "½-½"))
+
+(defn result-class [result]
+  (case result
+    "1-0" "white"
+    "0-1" "black"
+    "=-=" "draws"))
+
+(defn game-row [{:keys [date result wplayer bplayer welo belo]}]
+  [:tr
+   [:td [:span welo] [:span belo]]
+   [:td [:span wplayer][:span bplayer]]
+   [:td [:result {:class (result-class result)} (printable-result result)]]
+   [:td date]])
+
+(defn game-list []
+  [:table {:class "games"}
+   [:thead>tr
+    [:th {:colSpan "4"} "top games"]]
+   [:tbody
+    (for [game (scid.core/game-list)]
+      [game-row game])]])
+
+(defn explorer-box []
+  [:div {:class "explorer_box"}
+   ;; [spinner]
+   [:div {:class "data"}
+    [move-table]
+    [game-list]]])
 
 (defn game-controls []
   [:div {:class "game_control"}

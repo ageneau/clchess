@@ -30,3 +30,6 @@
 (defmacro handler-fn
   ([& body]
    `(fn [~'event] ~@body nil)))  ; always return nil
+
+(defn percent-string [x & {:keys [round] :or {round false}}]
+  (str (if round (int x) x) "%"))
