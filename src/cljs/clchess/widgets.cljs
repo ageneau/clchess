@@ -1,11 +1,11 @@
 (ns clchess.widgets
-    (:require [reagent.core :as reagent :refer [atom]]
-              [goog.dom :as dom]
-              [goog.dom.classlist :as classlist]
-              [goog.events :as events]
-              [clojure.string :as string]
-              [clchess.utils :as utils :refer [percent-string]]
-              [taoensso.timbre :as log]))
+  (:require [reagent.core :as reagent :refer [atom]]
+            [goog.dom :as dom]
+            [goog.dom.classlist :as classlist]
+            [goog.events :as events]
+            [clojure.string :as string]
+            [clchess.utils :as utils :refer [percent-string]]
+            [taoensso.timbre :as log]))
 
 
 (defn hamburger []
@@ -50,22 +50,22 @@
 (defn move-row [{:keys [move games white draw black rating]}]
   [:tr {;; :data-uci "b1c3"
         :title (str "Average rating: " rating)}
-       [:td move]
-       [:td games]
-       [:td [:div {:class "bar"}
-             [:span {:class "white" :style {:width (percent-string white)}} (percent-string white :round true)]
-             [:span {:class "draws" :style {:width (percent-string draw)}} (percent-string draw :round true)]
-             [:span {:class "black" :style {:width (percent-string black)}} (percent-string black :round true)]]]])
+   [:td move]
+   [:td games]
+   [:td [:div {:class "bar"}
+         [:span {:class "white" :style {:width (percent-string white)}} (percent-string white :round true)]
+         [:span {:class "draws" :style {:width (percent-string draw)}} (percent-string draw :round true)]
+         [:span {:class "black" :style {:width (percent-string black)}} (percent-string black :round true)]]]])
 
 (defn move-table []
   [:table {:class "moves"}
-     [:thead>tr
-      [:th "Move"]
-      [:th "Games"]
-      [:th "White / Draw / Black"]]
-     [:tbody
-      [move-row {:move "Nc3" :games 358 :white 39.4 :draw 34.4 :black 26.3 :rating 2489}]
-      [move-row {:move "Nd2" :games 244 :white 37.6 :draw 40 :black 22.4 :rating 2457}]]])
+   [:thead>tr
+    [:th "Move"]
+    [:th "Games"]
+    [:th "White / Draw / Black"]]
+   [:tbody
+    [move-row {:move "Nc3" :games 358 :white 39.4 :draw 34.4 :black 26.3 :rating 2489}]
+    [move-row {:move "Nd2" :games 244 :white 37.6 :draw 40 :black 22.4 :rating 2457}]]])
 
 (defn printable-result [result]
   (case result
@@ -101,6 +101,103 @@
    [:div {:class "data"}
     [move-table]
     [game-list]]])
+
+(defn study-overboard []
+  [:div.lichess_overboard.study_overboard
+   [:a.close.icon {:data-icon "L"}]
+   [:h2 "Edit study"]
+   [:form.material.form
+    [:div.game.form-group
+     [:input#study-name
+      {:required "", :minlength "3", :maxlength "100"}]
+     [:label.control-label {:for "study-name"} "Name"]
+     [:i.bar]]
+    [:div.game.form-group
+     [:select#study-visibility
+      [:option {:value "public"} "Public"]
+      [:option {:value "private"} "Invite only"]]
+     [:label.control-label
+      {:for "study-visibility"}
+      "Visibility"]
+     [:i.bar]]
+    [:div
+     [:div.game.form-group.half
+      [:select#study-computer
+       [:option {:value "everyone"} "Everyone"]
+       [:option {:value "nobody"} "Nobody"]
+       [:option {:value "owner"} "Only me"]
+       [:option {:value "contributor"} "Contributors"]]
+      [:label.control-label
+       {:for "study-computer"}
+       "Computer analysis"]
+      [:i.bar]]
+     [:div.game.form-group.half
+      [:select#study-explorer
+       [:option {:value "everyone"} "Everyone"]
+       [:option {:value "nobody"} "Nobody"]
+       [:option {:value "owner"} "Only me"]
+       [:option {:value "contributor"} "Contributors"]]
+      [:label.control-label
+       {:for "study-explorer"}
+       "Opening explorer"]
+      [:i.bar]]]
+    [:div.button-container
+     [:button.submit.button {:type "submit"} "Save"]]]
+   [:form.delete_study
+    {:action "/study/JsKHdGfK/delete", :method "post"}
+    [:button.button.frameless "Delete study"]]])
+
+(defn volume-control []
+  (let [shown (reagent/atom false)]
+    (fn []
+      (let [is-shown @shown]
+        [:div#sound_control.fright {:class (if is-shown "shown" "")}
+         [:a#sound_state.toggle.link.hint--bottom-left
+          {:data-hint "Sound"
+           :on-click #(utils/handler-fn
+                       (log/info "toggle")
+                       (reset! shown (not is-shown)))}
+          [:span.is2.on {:data-icon "#"}]
+          [:span.is2.off {:data-icon "$"}]]
+         [:div.dropdown
+          [:div.slider.ui-slider.ui-slider-vertical.ui-widget.ui-widget-content.ui-corner-all
+           [:div.ui-slider-range.ui-widget-header.ui-corner-all.ui-slider-range-min
+            {:style { :height "70%" }}]
+           [:span.ui-slider-handle.ui-state-default.ui-corner-all
+            {:tabindex "0", :style { :bottom "70%"}}]]
+          [:form.selector
+           {:action "/pref/soundSet"}
+           [:div.silent
+            [:input#soundSet_silent.active
+             {:checked "",
+              :type "radio",
+              :value "silent",
+              :name "soundSet"}]
+            [:label {:for "soundSet_silent"} "Silent"]]
+           [:div.standard
+            [:input#soundSet_standard
+             {:type "radio", :value "standard", :name "soundSet"}]
+            [:label {:for "soundSet_standard"} "Standard"]]
+           [:div.piano
+            [:input#soundSet_piano
+             {:type "radio", :value "piano", :name "soundSet"}]
+            [:label {:for "soundSet_piano"} "Piano"]]
+           [:div.nes
+            [:input#soundSet_nes
+             {:type "radio", :value "nes", :name "soundSet"}]
+            [:label {:for "soundSet_nes"} "NES"]]
+           [:div.sfx
+            [:input#soundSet_sfx
+             {:type "radio", :value "sfx", :name "soundSet"}]
+            [:label {:for "soundSet_sfx"} "SFX"]]
+           [:div.futuristic
+            [:input#soundSet_futuristic
+             {:type "radio", :value "futuristic", :name "soundSet"}]
+            [:label {:for "soundSet_futuristic"} "Futuristic"]]
+           [:div.robot
+            [:input#soundSet_robot
+             {:type "radio", :value "robot", :name "soundSet"}]
+            [:label {:for "soundSet_robot"} "Robot"]]]]]))))
 
 (defn game-controls []
   [:div {:class "game_control"}

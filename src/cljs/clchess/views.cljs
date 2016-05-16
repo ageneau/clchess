@@ -38,7 +38,8 @@
 (defn chessboard []
   [:div {:class "lichess_board_wrap cg-512"}
    [:div {:class "lichess_board standard"}
-    [:div {:id "chessground-container"}]]])
+    [:div {:id "chessground-container"}]
+    [widgets/study-overboard]]])
 
 (defn top-menu []
   [:div {:class "hover" :id "topmenu"}
@@ -61,7 +62,7 @@
    [top-menu]
    [widgets/hamburger]
    [theme/theme-selector theme]
-   ])
+   [widgets/volume-control]])
 
 (defn controls []
   [:div {:id "controls"}
