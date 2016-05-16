@@ -102,6 +102,41 @@
     [move-table]
     [game-list]]])
 
+(defn context-menu []
+  [:div#analyse-cm.visible
+   {:style { :left "910px" :top "265px" }}
+   [:div
+    [:p.title "4... exd5"]
+    [:a.action {:data-icon "E"} "Promote to main line"]
+    [:a.action {:data-icon "q"} "Delete from here"]
+    [:a.action {:data-icon "c"} "Comment this move"]
+    [:a.action.glyph-icon "Annotate with symbols"]]])
+
+(defn tip []
+  [:div.hopscotch-bubble.animated
+   {:style { :position "absolute" :top "530px" :left "609.219px" }}
+   [:div.hopscotch-bubble-container
+    {:style { :width "280px" :padding "15px" }}
+    [:span.hopscotch-bubble-number "1"]
+    [:div.hopscotch-bubble-content
+     [:h3.hopscotch-title "New feature!"]
+     [:div.hopscotch-content
+      "Click this button to enable"
+      [:br]
+      [:strong "lichess opening explorer"]
+      "."
+      [:br]
+      [:a
+       {:href
+        "http://lichess.org/blog/Vs0xMTAAAD4We4Ey/opening-explorer"}
+       "Learn more about it"]]]
+    [:div.hopscotch-actions
+     [:button.hopscotch-nav-button.next.hopscotch-next "OK, got it"]]
+    [:button.hopscotch-bubble-close.hopscotch-close "Close"]]
+   [:div.hopscotch-bubble-arrow-container.hopscotch-arrow.right
+    [:div.hopscotch-bubble-arrow-border]
+    [:div.hopscotch-bubble-arrow]]])
+
 (defn study-overboard []
   [:div.lichess_overboard.study_overboard
    [:a.close.icon {:data-icon "L"}]

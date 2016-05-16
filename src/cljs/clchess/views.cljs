@@ -85,4 +85,6 @@
         [widgets/opening-box]
         [widgets/replay]
         [widgets/explorer-box]
-        [widgets/game-controls]]]]]))
+        [widgets/game-controls]]]]
+     [widgets/tip]
+     [widgets/context-menu]]))
