@@ -10,7 +10,7 @@
             [clchess.widgets :as widgets]
             [taoensso.timbre :as log]))
 
-(def themes
+(def ^:const themes
   [{:name "light"
     :icon "5"}
    {:name "dark"
@@ -18,8 +18,8 @@
    {:name "transp"
     :icon "l"}])
 
-(defn theme-list []
-  (map #(:name %1) themes))
+(def ^:const theme-names
+  (into [] (map #(:name %1) themes)))
 
 (def data-themes
   ["blue" "blue2" "blue3" "canvas" "wood" "wood2" "wood3" "maple" "green" "marble" "brown" "leather" "grey" "metal" "olive" "purple"])
@@ -50,7 +50,7 @@
      ^{ :key theme } [:div {:class "theme" :data-theme theme} [:div {:class "color_demo blue"}]])])
 
 (defn switch-theme! [new-theme]
-  (classlist/removeAll (utils/body) (clj->js (theme-list)))
+  (classlist/removeAll (utils/body) (clj->js theme-names))
   (classlist/add (utils/body) new-theme))
 
 (defn switch-data-theme! [new-theme]

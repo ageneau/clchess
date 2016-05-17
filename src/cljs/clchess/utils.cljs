@@ -6,6 +6,8 @@
             [cljs.core.async :as async :refer [put! chan <!]]
             [taoensso.timbre :as log]))
 
+(def util (js/require "util"))
+
 (defn read-file [file]
   (print "read: " file)
   (let [fs (js/require "fs")]
@@ -33,3 +35,11 @@
 
 (defn percent-string [x & {:keys [round] :or {round false}}]
   (str (if round (int x) x) "%"))
+
+(defn inspect [obj]
+  (.log js/console (.inspect util obj #js { :showHidden true })))
+
+(defn char-code
+  "Return the Unicode of the first character in a string"
+  [string]
+  (.charCodeAt string))

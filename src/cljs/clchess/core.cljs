@@ -8,8 +8,8 @@
             ;; [node-webkit.core :as nw]
             [clchess.utils :as utils]
             [clchess.board :as board]
-            [clchess.handlers]
-            [clchess.subs]
+            [clchess.handlers] ;; Do not remove this. This is needed for handler registration
+            [clchess.subs] ;; Do not remove this. This is needed for subscription handler registration
             [clchess.views]
             [clchess.theme :as theme]
             [taoensso.timbre :as log])
@@ -38,11 +38,10 @@
 
 (defn reset-page []
   (dispatch-sync [:initialise-db])
+  (dispatch-sync [:game/update-board])
   (let [theme (subscribe [:theme])]
     (theme/init-theme @theme))
-  (mount-root)
-  (board/init-board)
-  (board/reset-board))
+  (mount-root))
 
 (defn init! []
   ;; (nw/menubar! [{:label "File"

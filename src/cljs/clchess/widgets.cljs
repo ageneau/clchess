@@ -1,12 +1,13 @@
 (ns clchess.widgets
   (:require [reagent.core :as reagent :refer [atom]]
+            [re-frame.core :refer [dispatch]]
             [goog.dom :as dom]
             [goog.dom.classlist :as classlist]
             [goog.events :as events]
+            [scid.core :as scid]
             [clojure.string :as string]
             [clchess.utils :as utils :refer [percent-string]]
             [taoensso.timbre :as log]))
-
 
 (defn hamburger []
   [:div {:id "ham-plate" :class "fright link hint--bottom" :data-hint "Menu"}
@@ -17,7 +18,14 @@
    [:i {:data-icon "<"}]
    [:div {:class "slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"}
     [:div {:class "ui-slider-range ui-widget-header ui-corner-all ui-slider-range-min" :style { :width value}}]
-    [:span {:class "ui-slider-handle ui-state-default ui-corner-all" :tabindex "0" :style { :left value }}]]])
+    [:span {:class "ui-slider-handle ui-state-default ui-corner-all" :tabIndex "0" :style { :left value }}]]])
+
+(defn vertical-slider [value]
+  [:div.slider.ui-slider.ui-slider-vertical.ui-widget.ui-widget-content.ui-corner-all
+   [:div.ui-slider-range.ui-widget-header.ui-corner-all.ui-slider-range-min
+    {:style { :height (utils/percent-string value)}}]
+   [:span.ui-slider-handle.ui-state-default.ui-corner-all
+    {:tabIndex "0", :style { :bottom (utils/percent-string value)}}]])
 
 ;; (defn slider [param value min max]
 ;;   [:input {:type "range" :value value :min min :max max
@@ -25,12 +33,60 @@
 ;;            :on-change (fn [e]
 ;;                         (swap! app-state assoc param (.-target.value e)))}])
 
+(defn to-pos [square]
+  (let [[file row] square
+        row-pos (- (utils/char-code row) (utils/char-code "1"))
+        file-pos (- (utils/char-code file) (utils/char-code "a"))]
+    [row-pos file-pos]))
+
+(defn to-square [pos]
+  (let [[file-pos row-pos] pos
+        row (char (+ row-pos (utils/char-code "a")))
+        file (char (+ file-pos (utils/char-code "1")))]
+    (str row file)))
+
+(defn square-pos [square]
+  (let [[row-pos file-pos] (to-pos square)]
+    {:bottom (utils/percent-string (* row-pos 12.5))
+     :left (utils/percent-string (* file-pos 12.5)) }))
+
+(def ^:const promotion-pieces ["queen" "knight" "rook" "bishop"])
+
+(defn adjacent-square [square direction nsquares]
+  (let [[row-pos file-pos] (to-pos square)]
+    (case direction
+      :right (to-square [row-pos (+ file-pos nsquares)])
+      :left (to-square [row-pos (- file-pos nsquares)])
+      :above (to-square [(+ row-pos nsquares) file-pos])
+      :below (to-square [(- row-pos nsquares) file-pos]))))
+
+(defn promotion-choice [promotion-square color]
+  (let [vpos (case color
+               "white" "top"
+               "black" "bottom")
+        [row-pos _] (to-pos promotion-square)
+        direction (case row-pos
+                    0 :above
+                    7 :below)
+        squares (map #(adjacent-square promotion-square
+                                       direction
+                                       %1)
+                     (range 4))]
+    ;; [:div#promotion_choice {:class vpos } "test"]
+    (into [:div#promotion_choice {:class vpos }]
+          (map (fn [piece square]
+                 [:square
+                  {:style (square-pos square)}
+                  [:piece { :class (string/join " " [piece color]) }]])
+               promotion-pieces
+               squares))))
+
 (defn ceval-box []
   [:div {:class "ceval_box"}
    [:div {:class "switch"}
     [:input {:id "analyse-toggle-ceval" :class "cmn-toggle cmn-toggle-round" :type "checkbox"}]
     [:label {:for "analyse-toggle-ceval"}]]
-   [:help "Local computer evaluation<br>for variation analysis"]])
+   [:help "Local computer evaluation" [:br] "for variation analysis"]])
 
 (defn opening-box []
   [:div {:class "opening_box" :title "B00 King's Pawn"}
@@ -137,54 +193,29 @@
     [:div.hopscotch-bubble-arrow-border]
     [:div.hopscotch-bubble-arrow]]])
 
-(defn study-overboard []
-  [:div.lichess_overboard.study_overboard
-   [:a.close.icon {:data-icon "L"}]
-   [:h2 "Edit study"]
-   [:form.material.form
-    [:div.game.form-group
-     [:input#study-name
-      {:required "", :minlength "3", :maxlength "100"}]
-     [:label.control-label {:for "study-name"} "Name"]
-     [:i.bar]]
-    [:div.game.form-group
-     [:select#study-visibility
-      [:option {:value "public"} "Public"]
-      [:option {:value "private"} "Invite only"]]
-     [:label.control-label
-      {:for "study-visibility"}
-      "Visibility"]
-     [:i.bar]]
-    [:div
-     [:div.game.form-group.half
-      [:select#study-computer
-       [:option {:value "everyone"} "Everyone"]
-       [:option {:value "nobody"} "Nobody"]
-       [:option {:value "owner"} "Only me"]
-       [:option {:value "contributor"} "Contributors"]]
-      [:label.control-label
-       {:for "study-computer"}
-       "Computer analysis"]
-      [:i.bar]]
-     [:div.game.form-group.half
-      [:select#study-explorer
-       [:option {:value "everyone"} "Everyone"]
-       [:option {:value "nobody"} "Nobody"]
-       [:option {:value "owner"} "Only me"]
-       [:option {:value "contributor"} "Contributors"]]
-      [:label.control-label
-       {:for "study-explorer"}
-       "Opening explorer"]
-      [:i.bar]]]
-    [:div.button-container
-     [:button.submit.button {:type "submit"} "Save"]]]
-   [:form.delete_study
-    {:action "/study/JsKHdGfK/delete", :method "post"}
-    [:button.button.frameless "Delete study"]]])
+(def soundset
+  [{:key "silent"
+    :text "Silent"
+    :active true }
+   {:key "piano"
+    :text "Piano"
+    :active false }
+   {:key "nes"
+    :text "NES"
+    :active false }
+   {:key "sfx"
+    :text "SFX"
+    :active false }
+   {:key "futuristic"
+    :text "Futuristic"
+    :active false }
+   {:key "robot"
+    :text "Robot"
+    :active false }])
 
-(defn volume-control []
+(defn volume-control [volume is-on]
   (let [shown (reagent/atom false)]
-    (fn []
+    (fn [volume]
       (let [is-shown @shown]
         [:div#sound_control.fright {:class (if is-shown "shown" "")}
          [:a#sound_state.toggle.link.hint--bottom-left
@@ -192,58 +223,34 @@
            :on-click #(utils/handler-fn
                        (log/info "toggle")
                        (reset! shown (not is-shown)))}
-          [:span.is2.on {:data-icon "#"}]
-          [:span.is2.off {:data-icon "$"}]]
+          [:span.is2 {:class (if is-on "off" "on") :data-icon "#"}]
+          [:span.is2 {:class (if is-on "on" "off") :data-icon "$"}]]
          [:div.dropdown
-          [:div.slider.ui-slider.ui-slider-vertical.ui-widget.ui-widget-content.ui-corner-all
-           [:div.ui-slider-range.ui-widget-header.ui-corner-all.ui-slider-range-min
-            {:style { :height "70%" }}]
-           [:span.ui-slider-handle.ui-state-default.ui-corner-all
-            {:tabindex "0", :style { :bottom "70%"}}]]
+          [vertical-slider volume]
           [:form.selector
            {:action "/pref/soundSet"}
-           [:div.silent
-            [:input#soundSet_silent.active
-             {:checked "",
-              :type "radio",
-              :value "silent",
-              :name "soundSet"}]
-            [:label {:for "soundSet_silent"} "Silent"]]
-           [:div.standard
-            [:input#soundSet_standard
-             {:type "radio", :value "standard", :name "soundSet"}]
-            [:label {:for "soundSet_standard"} "Standard"]]
-           [:div.piano
-            [:input#soundSet_piano
-             {:type "radio", :value "piano", :name "soundSet"}]
-            [:label {:for "soundSet_piano"} "Piano"]]
-           [:div.nes
-            [:input#soundSet_nes
-             {:type "radio", :value "nes", :name "soundSet"}]
-            [:label {:for "soundSet_nes"} "NES"]]
-           [:div.sfx
-            [:input#soundSet_sfx
-             {:type "radio", :value "sfx", :name "soundSet"}]
-            [:label {:for "soundSet_sfx"} "SFX"]]
-           [:div.futuristic
-            [:input#soundSet_futuristic
-             {:type "radio", :value "futuristic", :name "soundSet"}]
-            [:label {:for "soundSet_futuristic"} "Futuristic"]]
-           [:div.robot
-            [:input#soundSet_robot
-             {:type "radio", :value "robot", :name "soundSet"}]
-            [:label {:for "soundSet_robot"} "Robot"]]]]]))))
+           (for [{:keys [key text active]} soundset]
+             (let [class (string/join "_" ["soundSet" key])]
+               ^{:key key}
+               [:div {:class key }
+                [:input
+                 {:class (if active (string/join " " [class "active"]) class)
+                  :checked ""
+                  :type "radio"
+                  :value key
+                  :name "soundSet"}]
+                [:label {:for class } text]]))]]]))))
 
 (defn game-controls []
   [:div {:class "game_control"}
    [:div {:class "buttons"}
     [:div
      [:div {:class "jumps"}
-      [:button {:class "button" :data-icon "Y"}]
-      [:button {:class "first" :data-icon "W"}]]
+      [:button {:class "button" :data-icon "Y" :on-click #(dispatch [:game/previous-move])}]
+      [:button {:class "first" :data-icon "W" :on-click #(dispatch [:game/first-move])}]]
      [:div {:class "jumps"}
-      [:button {:class "button" :data-icon "X"}]
-      [:button {:class "first" :data-icon "V"}]]]
+      [:button {:class "button" :data-icon "X" :on-click #(dispatch [:game/next-move])}]
+      [:button {:class "first" :data-icon "V" :on-click #(dispatch [:game/last-move])}]]]
     [:div
      [:button {:id "open_explorer" :data-hint "openingExplorer" :class "button hint--bottom active"}
       [:i {:data-icon "]"}]]

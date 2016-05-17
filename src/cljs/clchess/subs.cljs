@@ -8,5 +8,11 @@
 (register-sub
  :theme
  (fn [db _]
-   (log/info "register-sub")
+   (log/info "register-sub :theme")
    (reaction (:theme @db))))
+
+(register-sub
+ :board
+ (fn [db _]
+   (log/info "register-sub :board")
+   (reaction (:board @db))))

@@ -1,80 +1,55 @@
 (ns clchess.board
     (:require [scid.core :as scid]
               [clchess.utils :as utils]
-              [taoensso.timbre :as log]))
+              [taoensso.timbre :as log]
+              [reagent.core :as reagent :refer [atom]]
+              [clchess.widgets :as widgets]
+              [re-frame.core :refer [subscribe dispatch dispatch-sync]]))
 
-(def chess (js/Chess.))
-(def loaded-game (js/Chess.))
-(def current-ply 0)
+;; https://github.com/Day8/re-frame/wiki/Using-Stateful-JS-Components
+(defn board-inner []
+  (let [board (atom nil)
+        options (clj->js {"zoom" 9})
+        update  (fn [comp]
+                  (let [{:keys [board-state]} (reagent/props comp)
+                        chessground (:chessground @board)
+                        movable (fn [origin dest metadata]
+                                  (log/debug "Origin:" origin "," dest "," metadata)
+                                  (dispatch [:game/board-move origin dest]))
+                        options {
+                                 :autoCastle true
+                                 :animation {:duration 300 }
+                                 :drawable {:enabled true }
+                                 :highlight {:lastMove true
+                                             :check true
+                                             :dragOver true}
+                                 }
+                        new-state (-> board-state
+                                      (merge options)
+                                      (assoc-in [:movable :events :after] movable))]
+                    (log/debug "Board state:" board-state)
+                    (log/debug "NEW state:" new-state)
+                    (.set chessground (clj->js new-state))))]
 
-(def *chessground*)
+    (reagent/create-class
+      {:reagent-render (fn []
+                         [:div.lichess_board_wrap {:class "cg-512"}
+                          [:div.lichess_board {:class "standard"}
+                           [:div {:id "chessground-container"}]
+                           ;; [widgets/promotion-choice "f8" "white"]
+                           ]])
 
-(def SQUARES (.-SQUARES chess))
+       :component-did-mount (fn [comp]
+                              (let [container (utils/by-id "chessground-container")
+                                    chessground (js/Chessground. container)]
+                                (log/debug "Component did mount:" comp ", " chessground)
+                                (reset! board {:chessground chessground}))
+                              (update comp))
 
-(defn color []
-  (if (= (.turn chess) "w") "white" "black"))
+       :component-did-update update
+       :display-name "board-inner"})))
 
-;; {"a2":["a3","a4"],"b2":["b3","b4"],"c2":["c3","c4"],"d2":["d3","d4"],"e2":["e3","e4"],"f2":["f3","f4"],"g2":["g3","g4"],"h2":["h3","h4"],"b1":["a3","c3"],"g1":["f3","h3"]}
-(defn moves [square]
-  (let [dests
-        (map (fn [move] ((js->clj move) "to"))
-             (.moves chess #js {:square square :verbose true}))]
-    (when (not-empty dests) {square dests})))
-
-(defn dest-squares []
-  (clj->js (reduce merge (map moves SQUARES))))
-
-(defn on-move [orig dest]
-  (log/info "on-move: " orig "->" dest)
-  (.move chess #js {:from orig :to dest})
-  (.set *chessground* #js {:turnColor (color) :movable #js {:color (color) :dests (dest-squares)}})
-  (log/info "board fen:" (.getFen *chessground*)))
-
-(defn init-board []
-  (set! *chessground* (js/Chessground. (utils/by-id "chessground-container"))))
-
-(defn reset-board []
-  (log/info "reset-board")
-  (.reset chess)
-  (.set *chessground* #js {
-                         :viewOnly false
-                         :autoCastle true
-                         :turnColor "white"
-                         :fen "start"
-                         :animation #js { :duration 500 }
-                         :movable #js {
-                                       :free false
-                                       :color (color)
-                                       :premove true
-                                       :dests (dest-squares)
-                                       :events #js { :after on-move }
-                                       }
-                         :drawable #js { :enabled true }
-                         }))
-
-
-(defn load-pgn [pgn]
-  (log/info "load-pgn: " pgn)
-  (set! current-ply 0)
-  (.reset chess)
-  (.reset loaded-game)
-  (.load_pgn loaded-game pgn)
-  (log/info "FEN: " (.fen loaded-game))
-  (.set *chessground* #js {
-                         :viewOnly true
-                         :autoCastle true
-                         :turnColor "white"
-                         :fen "start"
-                         :animation #js { :duration 500 }
-                         :drawable #js { :enabled true }
-                         }))
-
-(defn next-move []
-  (let [hist (.history loaded-game #js {:verbose true})
-      move (js->clj (get hist current-ply))]
-  (log/info "From: " (move "from") " to:" (move "to"))
-  (if (= current-ply (dec (count hist)))
-    (js/alert "End of game")
-    (do
-      (.move *chessground* (move "from") (move "to"))
-      (set! current-ply (inc current-ply))))))
+(defn board-outer []
+  (let [board (subscribe [:board])]   ;; obtain the data
+    (fn []
+      [board-inner {:board-state @board}])))

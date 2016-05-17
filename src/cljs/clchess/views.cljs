@@ -1,7 +1,6 @@
 (ns clchess.views
   (:require [reagent.core  :as reagent :refer [atom]]
             [re-frame.core :refer [subscribe dispatch]]
-            [re-frame.core :refer [subscribe dispatch]]
             [clchess.utils :as utils]
             [clchess.board :as board]
             [clchess.theme :as theme]
@@ -9,52 +8,82 @@
             [uci.core :as uci]
             [taoensso.timbre :as log]))
 
-(defn reset-button []
-  [:input {:type "button" :value "Reset"
-           :on-click #(board/reset-board)}])
 
 (defn start-engine-button []
   [:input {:type "button" :value "Start engine"
            :on-click #(uci/run-engine)}])
 
-(defn file-input [value]
+(defn file-input []
   [:input {:field :file
            :type :file
            :accept ".pgn"
-           :value @value
            :id "file-selector"
-           :on-change (fn [val]
-                        (let [file (-> val .-target .-value)]
-                          (reset! value (-> val .-target .-value))
-                          (board/load-pgn (utils/read-file file))))}])
+           :on-change #(dispatch [:file/changed (-> %1 .-target .-value)])
+           }])
 
-(defn selected-file []
-  (let [val (reagent/atom "None")]
-    (fn []
-      [:div
-       [:p "Selected file: " @val]
-       [file-input val]])))
+(defn study-overboard []
+  [:div.lichess_overboard.study_overboard
+   [:a.close.icon {:data-icon "L"}]
+   [:h2 "Edit study"]
+   [:form.material.form
+    [:div.game.form-group
+     [:input#study-name
+      {:required "", :minlength "3", :maxlength "100"}]
+     [:label.control-label {:for "study-name"} "Name"]
+     [:i.bar]]
+    [:div.game.form-group
+     [:select#study-visibility
+      [:option {:value "public"} "Public"]
+      [:option {:value "private"} "Invite only"]]
+     [:label.control-label
+      {:for "study-visibility"}
+      "Visibility"]
+     [:i.bar]]
+    [:div
+     [:div.game.form-group.half
+      [:select#study-computer
+       [:option {:value "everyone"} "Everyone"]
+       [:option {:value "nobody"} "Nobody"]
+       [:option {:value "owner"} "Only me"]
+       [:option {:value "contributor"} "Contributors"]]
+      [:label.control-label
+       {:for "study-computer"}
+       "Computer analysis"]
+      [:i.bar]]
+     [:div.game.form-group.half
+      [:select#study-explorer
+       [:option {:value "everyone"} "Everyone"]
+       [:option {:value "nobody"} "Nobody"]
+       [:option {:value "owner"} "Only me"]
+       [:option {:value "contributor"} "Contributors"]]
+      [:label.control-label
+       {:for "study-explorer"}
+       "Opening explorer"]
+      [:i.bar]]]
+    [:div.button-container
+     [:button.submit.button {:type "submit"} "Save"]]]
+   [:form.delete_study
+    {:action "/study/JsKHdGfK/delete", :method "post"}
+    [:button.button.frameless "Delete study"]]])
 
 (defn chessboard []
   [:div {:class "lichess_board_wrap cg-512"}
    [:div {:class "lichess_board standard"}
     [:div {:id "chessground-container"}]
-    [widgets/study-overboard]]])
+    ;; [study-overboard]
+    ]])
 
 (defn top-menu []
   [:div {:class "hover" :id "topmenu"}
    [:section
-    [:a "Play"]
+    [:a "File"]
     [:div
-     [:a "Create a game"]
-     [:a "Tournament"]
-     [:a "Simultaneous exhibitions"]]]
+     [:a {:on-click #(dispatch [:menu/open-db])} "Open database"]
+     [:a {:on-click #(dispatch [:menu/load-pgn])} "Load pgn"]]]
    [:section
-    [:a "Learn"]
+    [:a "Board"]
     [:div
-     [:a "Training"]
-     [:a "Openings"]
-     [:a "Coordinates"]]]])
+     [:a {:on-click #(dispatch [:menu/reset-board])} "Reset board"]]]])
 
 (defn top-section [theme]
   (log/info "top section:" (:is-2d theme))
@@ -62,16 +91,7 @@
    [top-menu]
    [widgets/hamburger]
    [theme/theme-selector theme]
-   [widgets/volume-control]])
-
-(defn controls []
-  [:div {:id "controls"}
-   [:input {:type "button" :value "back"}]
-   [:input {:type "button" :value "next"
-            :on-click #(board/next-move)}]
-   [selected-file]
-   [reset-button]
-   [start-engine-button]])
+   [widgets/volume-control 80 false]])
 
 (defn clchess-app []
   (let [theme (subscribe [:theme])]
@@ -79,12 +99,15 @@
      [top-section @theme]
      [:div {:class (if (:is-2d @theme) "is2d" "is3d") :id "content"}
       [:div {:class "lichess_game"}
-       [chessboard]
+       [board/board-outer]
+       ;;[chessboard]
        [:div {:class "lichess_ground"}
         [widgets/ceval-box]
         [widgets/opening-box]
         [widgets/replay]
         [widgets/explorer-box]
         [widgets/game-controls]]]]
-     [widgets/tip]
-     [widgets/context-menu]]))
+     [file-input]
+     ;; [widgets/tip]
+     ;; [widgets/context-menu]
+     ]))

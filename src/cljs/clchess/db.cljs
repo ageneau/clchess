@@ -1,6 +1,7 @@
 (ns clchess.db
   (:require [cljs.reader]
             [clchess.theme :as theme]
+            [clchess.ctrl :as ctrl]
             [schema.core  :as s :include-macros true]))
 
 
@@ -20,16 +21,38 @@
 ;; good practice.
 
 (def Theme {:is-2d s/Bool
-            :theme s/Str
-            :data-theme s/Str
-            :data-theme-3d s/Str
-            :data-set s/Str
-            :data-set-3d s/Str
+            :theme (apply s/enum theme/theme-names)
+            :data-theme (apply s/enum theme/data-themes)
+            :data-theme-3d (apply s/enum theme/data-themes-3d)
+            :data-set (apply s/enum theme/data-sets)
+            :data-set-3d (apply s/enum theme/data-sets-3d)
             :background-img s/Str
             :zoom s/Str
             })
 
-(def schema {:theme Theme})
+(def Square (apply s/enum ctrl/squares))
+
+(def SquareKeyword (apply s/enum (map keyword ctrl/squares)))
+
+(def Board {:viewOnly s/Bool
+            :turnColor (s/enum "white" "black")
+            :fen s/Str
+            :movable {
+                      :free s/Bool
+                      :color (s/enum "white" "black" "both")
+                      :premove s/Bool
+                      :dests {SquareKeyword [Square]}
+                      }})
+
+(def Move s/Str)
+
+(def Game {:initial-fen s/Str
+           :moves [Move]
+           :current-ply s/Int})
+
+(def schema {:theme Theme
+             :board Board
+             :game Game})
 
 
 
@@ -49,6 +72,16 @@
            :data-set-3d "Basic"
            :background-img "http://lichess1.org/assets/images/background/landscape.jpg"
            :zoom "80%"}
+   :board {:viewOnly false
+           :turnColor "white"
+           :fen "start"
+           :movable {:free false
+                     :color "both"
+                     :premove true
+                     :dests {}}}
+   :game {:initial-fen "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+          :moves ["e4" "d6" "d4" "g6" "Nc3" "Nf6"]
+          :current-ply 0}
    })
 
 
