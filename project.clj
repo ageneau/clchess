@@ -76,13 +76,12 @@
                            :optimizations :advanced
                            :pretty-print false}}]}
 
-  :garden
-  {:builds
-   [{:id           "clchess"
-     :source-paths ["src/clj"]
-     :stylesheet   clchess.css/clchess
-     :compiler     {:output-to     "resources/public/css/compiled/clchess.css"
-                    :pretty-print? true}}]}
+  :garden {:builds
+           [{:id           "clchess"
+             :source-paths ["src/garden"]
+             :stylesheet   clchess.css/clchess
+             :compiler     {:output-to     "resources/public/css/compiled/clchess.css"
+                            :pretty-print? true}}]}
 
   :figwheel {;; :http-server-root "public" ;; default and assumes "resources"
              ;; :server-port 3449 ;; default
