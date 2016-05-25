@@ -1,6 +1,6 @@
 {
   "name": "chess",
-  "main": "resources/public/index.html",
+  "main": "index.html",
   "version": "0.1.0",
   "window": {
     "title": "chess",
@@ -10,13 +10,12 @@
     "toolbar": true,
     "resizable": true
   },
-  "devDependencies": {
-    "connect": "*"
-  },
   "dependencies": {
-    "finalhandler": "^0.4.1",
-    "fs": "0.0.2",
-    "serve-static": "^1.10.2",
+    "node-notifier": "^4.2.1",
+    "nw-notify": "0.2.0",
     "uci": "^0.3.3"
+  },
+  "scripts": {
+    "start": "nw ."
   }
 }

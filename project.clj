@@ -24,11 +24,33 @@
                  [jamesmacaulay/cljs-promises "0.1.0"]
                  [prismatic/schema "1.0.3"]]
 
-  :plugins [[lein-cljsbuild "1.1.3"]
+  :plugins [[lein-cljsbuild "1.1.3" :exclusions [org.apache.commons/commons-compress]]
             [cider/cider-nrepl "0.12.0"]
             [lein-figwheel "0.5.2"]
             [lein-garden "0.2.6"]
-            [lein-ancient "0.6.10"]]
+            [lein-ancient "0.6.10"]
+            [lein-node-webkit-build "0.1.8"]]
+
+  :node-webkit-build {
+                      :root "resources/public" ; your node-webkit app root directory
+                      ;; :name nil ; use this to override the application name
+                      ;; :version nil ; use this to override the application version
+                      ;; :osx {
+                      ;;       :icon nil ; point to an .icns icon file to be used on the generated mac osx build
+                      ;;       }
+                      :platforms #{
+                                   ;; :osx
+                                   ;; :osx64
+                                   ;; :win
+                                   ;; :linux32
+                                   :linux64
+                                   } ; select which platforms to generate the build
+                      :nw-version "0.14.5" ; the node-webkit version to be used :latest for latest
+                      :output "releases" ; output directory for the generated builds
+                      :disable-developer-toolbar true ; this will update your package.json to remove the developer toolbar
+                      :use-lein-project-version true ; update the project version using your leiningen project version
+                      ;; :tmp-path (path-join "tmp" "nw-build") ; temporary path to place intermediate build files
+                      }
 
   :clean-targets ^{:protect false}
   ["resources/public/js/compiled"
