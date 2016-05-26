@@ -171,4 +171,8 @@
  [trim-v]
  (fn [old [file]]
    (log/debug "File changed: " file)
-   old))
+   (let [{game :game} old
+         file (utils/read-file file)
+         new-state (ctrl/load-pgn game file)]
+     (dispatch [:game/update-board])
+     (update-in old [:game] merge new-state))))

@@ -14,12 +14,15 @@
            :on-click #(uci/run-engine)}])
 
 (defn file-input []
-  [:input {:field :file
-           :type :file
-           :accept ".pgn"
-           :id "file-selector"
-           :on-change #(dispatch [:file/changed (-> %1 .-target .-value)])
-           }])
+  (let [value (reagent/atom "")]
+    [:input {:field :file
+             :type :file
+             :accept ".pgn"
+             :id "file-selector"
+             :value @value
+             :on-click #(reset! value "")
+             :on-change #(dispatch [:file/changed (-> %1 .-target .-value)])
+             }]))
 
 (defn study-overboard []
   [:div.lichess_overboard.study_overboard
