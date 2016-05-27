@@ -35,6 +35,14 @@
     {:bottom (utils/percent-string (* row-pos 12.5))
      :left (utils/percent-string (* file-pos 12.5)) }))
 
+(defn piece-to-db-format [piece]
+  (case piece
+    "pawn" "p"
+    "queen" "q"
+    "knight" "n"
+    "rook" "r"
+    "bishop" "b"))
+
 (def ^:const promotion-pieces ["queen" "knight" "rook" "bishop"])
 
 (defn adjacent-square [square direction nsquares]
@@ -62,7 +70,7 @@
           (map (fn [piece square]
                  [:square
                   {:style (square-pos square)
-                   :on-click #(dispatch [:game/promote-to piece])}
+                   :on-click #(dispatch [:game/promote-to (piece-to-db-format piece)])}
                   [:piece { :class (string/join " " [piece color]) }]])
                promotion-pieces
                squares))))

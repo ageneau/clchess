@@ -190,12 +190,11 @@
  :game/promote-to
  [trim-v]
  (fn [old [piece]]
-   (log/debug "Promote to: " (first piece))
+   (log/debug "Promote to: " piece)
    (let [game (:game old)
          board (:board old)
          {from :from to :to } (:promotion board)
-         promoted-piece (first piece)
-         new-state (ctrl/make-move game from to :promotion promoted-piece)]
+         new-state (ctrl/make-move game from to :promotion piece)]
      (log/debug "Make move:" new-state ", NEW STATE:" (update-in old [:game] merge new-state))
      (dispatch [:game/update-board])
      (-> old
