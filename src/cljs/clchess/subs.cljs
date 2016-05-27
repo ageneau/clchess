@@ -16,3 +16,9 @@
  (fn [db _]
    (log/info "register-sub :board")
    (reaction (:board @db))))
+
+(register-sub
+ :game/moves
+ (fn [db _]
+   (log/info "register-sub :game/moves: " (get-in @db [:game :moves]))
+   (reaction (get-in @db [:game :moves]))))

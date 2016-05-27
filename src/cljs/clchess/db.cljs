@@ -44,7 +44,12 @@
                       :dests {SquareKeyword [Square]}
                       }})
 
-(def Move s/Str)
+(def Move {:color (s/enum "w" "b")
+           :from s/Str
+           :to s/Str
+           :flags s/Str
+           :piece s/Str
+           :san s/Str})
 
 (def Game {:initial-fen s/Str
            :moves [Move]
@@ -80,7 +85,7 @@
                      :premove true
                      :dests {}}}
    :game {:initial-fen "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-          :moves ["e4" "d6" "d4" "g6" "Nc3" "Nf6"]
+          :moves []
           :current-ply 0}
    })
 

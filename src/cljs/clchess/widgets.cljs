@@ -1,6 +1,6 @@
 (ns clchess.widgets
   (:require [reagent.core :as reagent :refer [atom]]
-            [re-frame.core :refer [dispatch]]
+            [re-frame.core :refer [dispatch subscribe]]
             [goog.dom :as dom]
             [goog.dom.classlist :as classlist]
             [goog.events :as events]
@@ -93,10 +93,24 @@
    [:strong "B00"]
    " King's Pawn"])
 
+(defn ^:private group-moves-by-color [moves]
+  (let [start-color (:color (first moves))
+        last-color (:color (last moves))
+        partitionable `[~@(when-not (= start-color "w") '(:empty-move))
+                        ~@moves
+                        ~@(when-not (= last-color "b") '(:empty-move))]]
+    (partition 2 partitionable)))
+
 (defn replay []
-  [:div {:class "replay"}
-   [:turn [:index "1"] [:move "e4"] [:move "e6"]]
-   [:turn [:index "2"] [:move "d4"] [:move {:class "active"} "d5"]]])
+  (fn []
+    (let [moves (subscribe [:game/moves])
+          grouped (group-moves-by-color @moves)]
+      (log/debug "REPLAY: " @moves)
+      [:div {:class "replay"}
+       (for [[wmove bmove] grouped]
+         `[:turn [:index "1"]
+           ~@(when-not (= wmove :empty-move) (list [:move (:san wmove)]))
+           ~@(when-not (= bmove :empty-move) (list [:move (:san bmove)]))])])))
 
 (defn spinner []
   [:div {:class "spinner"}
