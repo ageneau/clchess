@@ -19,7 +19,7 @@
     :icon "l"}])
 
 (def ^:const theme-names
-  (into [] (map #(:name %1) themes)))
+  (into [] (map #(:name %) themes)))
 
 (def data-themes
   ["blue" "blue2" "blue3" "canvas" "wood" "wood2" "wood3" "maple" "green" "marble" "brown" "leather" "grey" "metal" "olive" "purple"])
@@ -69,7 +69,7 @@
         (classlist/add (utils/body) new-set)))))
 
 (defn init-theme [theme]
-  (log/info "init-theme:" theme)
+  (log/debug "init-theme:" theme)
   (switch-theme! (:name theme))
   (if (:is-2d theme)
     (do
@@ -86,7 +86,7 @@
        ^{ :key theme }
        [:div {:class "theme" :data-theme theme
               :on-click #(do
-                           (log/info "Select:" theme)
+                           (log/debug "Select:" theme)
                            (swap! theme-state assoc (if is-2d :data-theme :data-theme-3d) theme)
                            (switch-data-theme! theme))}
         [:div {:class (string/join " " ["color_demo" theme])}]])]))
@@ -99,7 +99,7 @@
        [:div {:class "no-square"
               :data-set set
               :on-click #(do
-                           (log/info "Select set:" set)
+                           (log/debug "Select set:" set)
                            (swap! theme-state assoc (if is-2d :data-set :data-set-3d) set)
                            (switch-data-set! set {:is-2d is-2d}))}
         [:piece {:class set}]])]))
@@ -110,19 +110,19 @@
            :class "background_image"
            :value (@theme-state :background-img)
            :on-change #(do
-                         (js/info "Background:" %1)
-                         (swap! theme-state assoc :background-img %1))}])
+                         (js/info "Background:" %)
+                         (swap! theme-state assoc :background-img %))}])
 
 (defn theme-selector-dropdown [theme]
   (fn [theme]
-    (log/info "theme-selector-dropdown")
+    (log/debug "theme-selector-dropdown")
     [:div {:class "dropdown"
            :data-themes (string/join " " data-themes)
            :data-theme3ds (string/join " " data-themes-3d)
            :data-sets (string/join " " data-sets)
            :data-set3ds (string/join " " data-sets-3d)}
      [widgets/simple-toggle themes {:container-class "background"
-                                    :on-toggle #(switch-theme! (:name %1))
+                                    :on-toggle #(switch-theme! (:name %))
                                     :initial-value (:theme @theme-state)}]
      (let [options [{:name "d2" :text "2D"}
                     {:name "d3" :text "3D"}]
@@ -130,8 +130,8 @@
        [widgets/simple-toggle
         options
         {:container-class "dimensions"
-         :on-toggle #(let [new-val (= "d2" (%1 :name))]
-                       (log/info "Switch dim:" new-val)
+         :on-toggle #(let [new-val (= "d2" (:name %))]
+                       (log/debug "Switch dim:" new-val)
                        (dispatch-sync [:set-is-2d  new-val])
                        (let [theme (assoc theme :is-2d new-val)]
                          (init-theme theme)))
@@ -147,14 +147,14 @@
 (defn theme-selector [theme]
   (let [shown (reagent/atom false)]
     (fn [theme]
-      (log/info "theme-selector")
+      (log/debug "theme-selector")
       (let [is-shown @shown
             toggle [:a {:id "themepicker_toggle"
                         :class "toggle icon link hint--bottom-left"
                         :data-hint "Theming"
                         :data-url "/themepicker"
                         :on-click #(utils/handler-fn
-                                    (log/info "toggle")
+                                    (log/debug "toggle")
                                     (reset! shown (not is-shown)))}
                     [:span {:data-icon "}"}]]]
         (if is-shown

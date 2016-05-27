@@ -8,17 +8,23 @@
 (register-sub
  :theme
  (fn [db _]
-   (log/info "register-sub :theme")
+   (log/debug "register-sub :theme")
    (reaction (:theme @db))))
 
 (register-sub
  :board
  (fn [db _]
-   (log/info "register-sub :board")
+   (log/debug "register-sub :board")
    (reaction (:board @db))))
 
 (register-sub
  :game/moves
  (fn [db _]
-   (log/info "register-sub :game/moves: " (get-in @db [:game :moves]))
+   (log/debug "register-sub :game/moves: " (get-in @db [:game :moves]))
    (reaction (get-in @db [:game :moves]))))
+
+(register-sub
+ :game/promotion
+ (fn [db _]
+   (log/debug "register-sub :game/promotion: " (get-in @db [:board :promotion]))
+   (reaction (get-in @db [:board :promotion]))))

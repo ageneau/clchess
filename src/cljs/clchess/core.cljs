@@ -37,6 +37,10 @@
   (reagent/render [clchess.views/clchess-app] (utils/by-id "app")))
 
 (defn reset-page []
+  (log/merge-config! {:ns-whitelist ["clchess.board"
+                                     "clchess.handlers"
+                                     "clchess.ctrl"]})
+  (log/set-level! :debug)
   (dispatch-sync [:initialise-db])
   (dispatch-sync [:game/update-board])
   (let [theme (subscribe [:theme])]

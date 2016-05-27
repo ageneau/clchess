@@ -65,7 +65,7 @@
    (let [{ current-ply :current-ply moves :moves } old]
      (if (= current-ply (count moves))
        (do
-         (log/info "End of game")
+         (log/debug "End of game")
          old)
        (do
          (log/debug "Next move:" old)
@@ -80,7 +80,7 @@
    (let [{ current-ply :current-ply moves :moves } old]
      (if (= current-ply 0)
        (do
-         (log/info "Beggining of game")
+         (log/debug "Beggining of game")
          old)
        (do
          (log/debug "Previous move:" old)
@@ -116,18 +116,27 @@
 (register-handler
  :game/board-move
  [trim-v]
- (fn [old [from to :as move]]
+ (fn [old [from to { promoting :promoting player :player :as flags } :as move]]
    (let [game (:game old)
+         board (:board old)
          { current-ply :current-ply moves :moves } game]
-     (log/debug "Board move:" from "," to "," current-ply)
-     (if (= current-ply (count moves))
+     (log/debug "Board move:" from "," to "," current-ply ", flags:" flags ", promoting: " promoting)
+     (cond
+       (not= current-ply (count moves))
+       (do
+         (log/debug "Not at the end of the move list")
+         old)
+
+       promoting
+       (let [promotion {:show true :from from :to to :player player}]
+         (log/debug "Promoting:" (:board (assoc-in old [:board :promotion] promotion)))
+         (assoc-in old [:board :promotion] promotion))
+
+       :else
        (let [new-state (ctrl/make-move game from to)]
          (log/debug "Make move:" new-state ", NEW STATE:" (update-in old [:game] merge new-state))
          (dispatch [:game/update-board])
-         (update-in old [:game] merge new-state))
-       (do
-         (log/debug "Not at the end of the move list")
-         old)))))
+         (update-in old [:game] merge new-state))))))
 
 (register-handler
  :game/update-board
@@ -176,3 +185,19 @@
          new-state (ctrl/load-pgn game file)]
      (dispatch [:game/update-board])
      (update-in old [:game] merge new-state))))
+
+(register-handler
+ :game/promote-to
+ [trim-v]
+ (fn [old [piece]]
+   (log/debug "Promote to: " (first piece))
+   (let [game (:game old)
+         board (:board old)
+         {from :from to :to } (:promotion board)
+         promoted-piece (first piece)
+         new-state (ctrl/make-move game from to :promotion promoted-piece)]
+     (log/debug "Make move:" new-state ", NEW STATE:" (update-in old [:game] merge new-state))
+     (dispatch [:game/update-board])
+     (-> old
+         (update-in [:game] merge new-state)
+         (assoc-in [:board :promotion] {:show false})))))

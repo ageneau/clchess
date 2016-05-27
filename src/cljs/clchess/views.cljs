@@ -21,7 +21,7 @@
              :id "file-selector"
              :value @value
              :on-click #(reset! value "")
-             :on-change #(dispatch [:file/changed (-> %1 .-target .-value)])
+             :on-change #(dispatch [:file/changed (-> % .-target .-value)])
              }]))
 
 (defn study-overboard []
@@ -89,7 +89,7 @@
      [:a {:on-click #(dispatch [:menu/reset-board])} "Reset board"]]]])
 
 (defn top-section [theme]
-  (log/info "top section:" (:is-2d theme))
+  (log/debug "top section:" (:is-2d theme))
   [:div {:class (if (:is-2d theme) "is2d" "is3d") :id "top"}
    [top-menu]
    [widgets/hamburger]
@@ -97,7 +97,8 @@
    [widgets/volume-control 80 false]])
 
 (defn clchess-app []
-  (let [theme (subscribe [:theme])]
+  (let [theme (subscribe [:theme])
+        moves (subscribe [:game/moves])]
     [:div {:id "page-container"}
      [top-section @theme]
      [:div {:class (if (:is-2d @theme) "is2d" "is3d") :id "content"}
@@ -107,7 +108,7 @@
        [:div {:class "lichess_ground"}
         [widgets/ceval-box]
         [widgets/opening-box]
-        [widgets/replay]
+        [widgets/replay @moves]
         [widgets/explorer-box]
         [widgets/game-controls]]]]
      [file-input]

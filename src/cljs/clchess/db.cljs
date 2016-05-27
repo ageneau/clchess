@@ -42,13 +42,20 @@
                       :color (s/enum "white" "black" "both")
                       :premove s/Bool
                       :dests {SquareKeyword [Square]}
-                      }})
+                      }
+            :promotion {:show s/Bool
+                        (s/optional-key :from) Square
+                        (s/optional-key :to) Square
+                        (s/optional-key :player) (s/enum "white" "black")}})
+
+(def Piece (s/enum "q" "k" "b" "r"))
 
 (def Move {:color (s/enum "w" "b")
-           :from s/Str
-           :to s/Str
+           :from Square
+           :to Square
            :flags s/Str
-           :piece s/Str
+           :piece Piece
+           :promotion Piece
            :san s/Str})
 
 (def Game {:initial-fen s/Str
@@ -83,7 +90,8 @@
            :movable {:free false
                      :color "both"
                      :premove true
-                     :dests {}}}
+                     :dests {}}
+           :promotion {:show false}}
    :game {:initial-fen "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
           :moves []
           :current-ply 0}

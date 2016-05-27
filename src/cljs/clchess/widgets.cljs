@@ -33,54 +33,6 @@
 ;;            :on-change (fn [e]
 ;;                         (swap! app-state assoc param (.-target.value e)))}])
 
-(defn to-pos [square]
-  (let [[file row] square
-        row-pos (- (utils/char-code row) (utils/char-code "1"))
-        file-pos (- (utils/char-code file) (utils/char-code "a"))]
-    [row-pos file-pos]))
-
-(defn to-square [pos]
-  (let [[file-pos row-pos] pos
-        row (char (+ row-pos (utils/char-code "a")))
-        file (char (+ file-pos (utils/char-code "1")))]
-    (str row file)))
-
-(defn square-pos [square]
-  (let [[row-pos file-pos] (to-pos square)]
-    {:bottom (utils/percent-string (* row-pos 12.5))
-     :left (utils/percent-string (* file-pos 12.5)) }))
-
-(def ^:const promotion-pieces ["queen" "knight" "rook" "bishop"])
-
-(defn adjacent-square [square direction nsquares]
-  (let [[row-pos file-pos] (to-pos square)]
-    (case direction
-      :right (to-square [row-pos (+ file-pos nsquares)])
-      :left (to-square [row-pos (- file-pos nsquares)])
-      :above (to-square [(+ row-pos nsquares) file-pos])
-      :below (to-square [(- row-pos nsquares) file-pos]))))
-
-(defn promotion-choice [promotion-square color]
-  (let [vpos (case color
-               "white" "top"
-               "black" "bottom")
-        [row-pos _] (to-pos promotion-square)
-        direction (case row-pos
-                    0 :above
-                    7 :below)
-        squares (map #(adjacent-square promotion-square
-                                       direction
-                                       %1)
-                     (range 4))]
-    ;; [:div#promotion_choice {:class vpos } "test"]
-    (into [:div#promotion_choice {:class vpos }]
-          (map (fn [piece square]
-                 [:square
-                  {:style (square-pos square)}
-                  [:piece { :class (string/join " " [piece color]) }]])
-               promotion-pieces
-               squares))))
-
 (defn ceval-box []
   [:div {:class "ceval_box"}
    [:div {:class "switch"}
@@ -101,16 +53,18 @@
                         ~@(when-not (= last-color "b") '(:empty-move))]]
     (partition 2 partitionable)))
 
-(defn replay []
-  (fn []
-    (let [moves (subscribe [:game/moves])
-          grouped (group-moves-by-color @moves)]
-      (log/debug "REPLAY: " @moves)
-      [:div {:class "replay"}
-       (for [[wmove bmove] grouped]
-         `[:turn [:index "1"]
-           ~@(when-not (= wmove :empty-move) (list [:move (:san wmove)]))
-           ~@(when-not (= bmove :empty-move) (list [:move (:san bmove)]))])])))
+(defn replay [moves]
+  (fn [moves]
+    (let [grouped (group-moves-by-color moves)]
+      (log/debug "REPLAY: " moves)
+      (into [:div {:class "replay"}]
+            (for [i (range (count grouped))]
+              (let [[wmove bmove] (nth grouped i)
+                    key (str "replay_" i)]
+                ^{ :key key }
+                `[:turn [:index ~(str (+ i 1))]
+                  ~@(when-not (= wmove :empty-move) (list [:move (:san wmove)]))
+                  ~@(when-not (= bmove :empty-move) (list [:move (:san bmove)]))]))))))
 
 (defn spinner []
   [:div {:class "spinner"}
@@ -235,7 +189,7 @@
          [:a#sound_state.toggle.link.hint--bottom-left
           {:data-hint "Sound"
            :on-click #(utils/handler-fn
-                       (log/info "toggle")
+                       (log/debug "toggle")
                        (reset! shown (not is-shown)))}
           [:span.is2 {:class (if is-on "off" "on") :data-icon "#"}]
           [:span.is2 {:class (if is-on "on" "off") :data-icon "$"}]]
