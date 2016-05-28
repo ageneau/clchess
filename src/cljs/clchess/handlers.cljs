@@ -133,17 +133,18 @@
          (assoc-in old [:board :promotion] promotion))
 
        :else
-       (let [new-state (ctrl/make-move game from to)]
-         (log/debug "Make move:" new-state ", NEW STATE:" (update-in old [:game] merge new-state))
+       (let [game-state (ctrl/make-move game from to)
+             updated-state (update-in old [:game] merge game-state)]
+         (log/debug "Make move:" game-state)
          (dispatch [:game/update-board])
-         (update-in old [:game] merge new-state))))))
+         updated-state)))))
 
 (register-handler
  :game/update-board
  [trim-v]
  (fn [old _]
    (let [{board :board game :game} old
-         {fen :fen color :color dest-squares :dest-squares} (ctrl/compute-state game)
+         {fen :fen color :color dest-squares :dest-squares :as state} (ctrl/compute-state game)
          updated-board (-> old
                            (assoc-in [:board :turnColor] color)
                            (assoc-in [:board :fen] fen)

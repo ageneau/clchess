@@ -50,13 +50,18 @@
 
 (def Piece (s/enum "q" "k" "b" "r"))
 
+(def San s/Str)
+
+(def Fen s/Str)
+
 (def Move {:color (s/enum "w" "b")
            :from Square
            :to Square
            :flags s/Str
            :piece Piece
            :promotion Piece
-           :san s/Str})
+           :san San
+           :fen Fen})
 
 (def Game {:initial-fen s/Str
            :moves [Move]
