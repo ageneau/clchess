@@ -70,7 +70,10 @@
            :moves [Move]
            :current-ply s/Int})
 
+(def View {:is-full-screen s/Bool})
+
 (def schema {:theme Theme
+             :view View
              :board Board
              :game Game})
 
@@ -92,6 +95,7 @@
            :data-set-3d "Basic"
            :background-img "http://lichess1.org/assets/images/background/landscape.jpg"
            :zoom "80%"}
+   :view {:is-full-screen false}
    :board {:viewOnly false
            :turnColor "white"
            :lastMove nil

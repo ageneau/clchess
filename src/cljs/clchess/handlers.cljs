@@ -3,6 +3,7 @@
     [clchess.db    :refer [default-value ls->theme theme->ls! schema]]
     [re-frame.core :refer [dispatch register-handler path trim-v after debug]]
     [schema.core   :as s]
+    [node-webkit.core :as nw]
     [clchess.theme :as theme]
     [clchess.utils :as utils]
     [clchess.ctrl :as ctrl]
@@ -174,6 +175,19 @@
      (log/debug "Selector: " selector)
      (.click selector))
    old))
+
+(register-handler
+ :menu/full-screen
+ [(path :view)
+  trim-v]
+ (fn [{is-full-screen :is-full-screen :as old} _]
+   (log/debug "Toggle full screen: " is-full-screen)
+   (let [window (nw/window)
+         new-state (not is-full-screen)]
+     (if new-state
+       (.enterFullscreen window)
+       (.leaveFullscreen window))
+     (assoc old :is-full-screen new-state))))
 
 (register-handler
  :menu/reset-board

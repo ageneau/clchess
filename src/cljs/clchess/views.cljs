@@ -84,6 +84,10 @@
      [:a {:on-click #(dispatch [:menu/open-db])} "Open database"]
      [:a {:on-click #(dispatch [:menu/load-pgn])} "Load pgn"]]]
    [:section
+    [:a "View"]
+    [:div
+     [:a {:on-click #(dispatch [:menu/full-screen])} "Full screen"]]]
+   [:section
     [:a "Board"]
     [:div
      [:a {:on-click #(dispatch [:menu/reset-board])} "Reset board"]]]])
