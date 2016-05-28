@@ -1,13 +1,16 @@
 (ns clchess.handlers
   (:require
-    [clchess.db    :refer [default-value ls->theme theme->ls! schema]]
-    [re-frame.core :refer [dispatch register-handler path trim-v after debug]]
-    [schema.core   :as s]
-    [node-webkit.core :as nw]
-    [clchess.theme :as theme]
-    [clchess.utils :as utils]
-    [clchess.ctrl :as ctrl]
-    [taoensso.timbre :as log]))
+   [clojure.string :as string]
+   [clchess.db    :refer [default-value ls->theme theme->ls! schema]]
+   [re-frame.core :refer [dispatch register-handler path trim-v after debug]]
+   [schema.core   :as s]
+   [node-webkit.core :as nw]
+   [clchess.theme :as theme]
+   [clchess.utils :as utils]
+   [clchess.ctrl :as ctrl]
+   [clchess.views :as views]
+   [scid.base :as chessdb]
+   [taoensso.timbre :as log]))
 
 
 ;; -- Middleware --------------------------------------------------------------
@@ -43,7 +46,6 @@
   check-schema-mw                 ;; afterwards: check that app-db matches the schema
   (fn [_ _]                       ;; the handler being registered
     (merge default-value (ls->theme))))  ;; all hail the new state
-
 
                                   ;; usage:  (dispatch [:set-is-2d  true])
 (register-handler                 ;; this handler changes the 2d/3d view flag
@@ -164,17 +166,20 @@
  [trim-v]
  (fn [old _]
    (log/debug "Open DB")
-   old))
+   (dispatch [:file/open-selector])
+   (-> old
+       (assoc-in [:file-selector :action] :open-db)
+       (assoc-in [:file-selector :accept] (string/join "," [".si4" ".si3" ".pgn" ".PGN" ".pgn.gz"])))))
 
 (register-handler
  :menu/load-pgn
  [trim-v]
  (fn [old _]
    (log/debug "Load pgn")
-   (let [selector (utils/by-id "file-selector")]
-     (log/debug "Selector: " selector)
-     (.click selector))
-   old))
+   (dispatch [:file/open-selector])
+   (-> old
+       (assoc-in [:file-selector :action] :load-pgn)
+       (assoc-in [:file-selector :accept] ".pgn"))))
 
 (register-handler
  :menu/full-screen
@@ -197,15 +202,38 @@
    old))
 
 (register-handler
+ :menu/quit
+ [trim-v]
+ (fn [old _]
+   (log/debug "Quit")
+   (nw/quit)
+   old))
+
+(register-handler
+ :file/open-selector
+ [(path :file-selector)
+  trim-v]
+ (fn [{opened :opened :as old} _]
+   (views/open-file)
+   (assoc old :opened true)))
+
+(register-handler
  :file/changed
  [trim-v]
- (fn [old [file]]
-   (log/debug "File changed: " file)
-   (let [{game :game} old
-         file (utils/read-file file)
-         new-state (ctrl/load-pgn game file)]
-     (dispatch [:game/update-board])
-     (update-in old [:game] merge new-state))))
+ (fn [db [action file]]
+   (log/debug "File changed: " action ", " file)
+   (let [db (assoc-in db [:file-selector :opened] false)]
+     (case action
+       :load-pgn
+       (let [{game :game} db
+             file (utils/read-file file)
+             new-state (ctrl/load-pgn game file)]
+         (dispatch [:game/update-board])
+         (update-in db [:game] merge new-state))
+
+       :open-db
+       (do (dispatch [:db/open file])
+           db)))))
 
 (register-handler
  :game/promote-to
@@ -221,3 +249,18 @@
      (-> old
          (update-in [:game] merge new-state)
          (assoc-in [:board :promotion] {:show false})))))
+
+(register-handler
+ :db/open
+ [(path :databases)
+  trim-v]
+ (fn [databases [fn]]
+   (log/debug "Databases: " databases ", " fn ", " (find fn databases))
+   (if-not (find fn databases)
+     (let [key (chessdb/open (utils/remove-extension fn))
+           new {:key key :name fn :type :scid :opened true}]
+       (log/debug "key=" key ", " new)
+       (-> databases
+           (assoc :current new)
+           (assoc-in [:all key] new)))
+     databases)))

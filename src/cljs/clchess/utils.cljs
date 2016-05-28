@@ -14,6 +14,15 @@
     (when (.existsSync fs file)
       (.readFileSync fs file "utf8"))))
 
+(defn real-path [file]
+  (let [fs (js/require "fs")]
+    (when (.existsSync fs file)
+      (.realpathSync fs file))))
+
+(defn remove-extension [fn]
+  "Removes the file extension from a file name"
+  (string/replace fn #"\.[^.]*$" ""))
+
 (defn long-str [& strings] (string/join "\n" strings))
 
 (defn by-id [id]
@@ -43,3 +52,4 @@
   "Return the Unicode of the first character in a string"
   [string]
   (.charCodeAt string))
+

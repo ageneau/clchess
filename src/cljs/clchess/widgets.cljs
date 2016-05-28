@@ -111,13 +111,13 @@
    [:td date]])
 
 (defn game-list []
-  [:table {:class "games"}
-   [:thead>tr
-    [:th {:colSpan "4"} "top games"]]
-   [:tbody
-    (for [game (scid.core/game-list)]
-      ^ { :key (:id game)}
-      [game-row game])]])
+  (let [games (subscribe [:game/list])]
+    [:table {:class "games"}
+     [:thead>tr
+      [:th {:colSpan "4"} "top games"]]
+     (for [game @games]
+       ^ { :key (:id game)}
+       [game-row game])]))
 
 (defn explorer-box []
   [:div {:class "explorer_box"}

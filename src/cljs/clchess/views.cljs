@@ -13,15 +13,24 @@
   [:input {:type "button" :value "Start engine"
            :on-click #(uci/run-engine)}])
 
+(defn open-file []
+  (let [selector (utils/by-id "file-selector")]
+     (log/debug "Selector: " selector)
+     (.click selector)))
+
 (defn file-input []
-  (let [value (reagent/atom "")]
+  (let [selector @(subscribe [:file-selector/changed])
+        accept (:accept selector)
+        action (:action selector)
+        value (reagent/atom "")]
+    (log/debug "file-input: " selector)
     [:input {:field :file
              :type :file
-             :accept ".pgn"
+             :accept accept
              :id "file-selector"
              :value @value
              :on-click #(reset! value "")
-             :on-change #(dispatch [:file/changed (-> % .-target .-value)])
+             :on-change #(dispatch [:file/changed action (-> % .-target .-value)])
              }]))
 
 (defn study-overboard []
@@ -82,7 +91,8 @@
     [:a "File"]
     [:div
      [:a {:on-click #(dispatch [:menu/open-db])} "Open database"]
-     [:a {:on-click #(dispatch [:menu/load-pgn])} "Load pgn"]]]
+     [:a {:on-click #(dispatch [:menu/load-pgn])} "Load pgn"]
+     [:a {:on-click #(dispatch [:menu/quit])} "Quit"]]]
    [:section
     [:a "View"]
     [:div
@@ -108,7 +118,6 @@
      [:div {:class (if (:is-2d @theme) "is2d" "is3d") :id "content"}
       [:div {:class "lichess_game"}
        [board/board-outer]
-       ;;[chessboard]
        [:div {:class "lichess_ground"}
         [widgets/ceval-box]
         [widgets/opening-box]

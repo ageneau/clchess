@@ -37,9 +37,12 @@
   (reagent/render [clchess.views/clchess-app] (utils/by-id "app")))
 
 (defn reset-page []
-  (log/merge-config! {:ns-whitelist ["clchess.board"
+  (log/merge-config! {:ns-whitelist [#_"clchess.board"
                                      "clchess.handlers"
-                                     "clchess.ctrl"]})
+                                     "clchess.subs"
+                                     #_"clchess.views"
+                                     "scid.*"
+                                     #_"clchess.ctrl"]})
   (log/set-level! :debug)
   (dispatch-sync [:initialise-db])
   (dispatch-sync [:game/update-board])
@@ -48,10 +51,10 @@
   (mount-root))
 
 (defn init! []
-  ;; (nw/menubar! [{:label "File"
-  ;;                :submenu (nw/menu [{:label "Open"
-  ;;                                    :click #(let [selector (utils/by-id "file-selector")]
-  ;;                                              (.click selector))}
-  ;;                                   {:label "Quit"
-  ;;                                    :click nw/quit}])}])
+  #_(nw/menubar! [{:label "File"
+                 :submenu (nw/menu [{:label "Open"
+                                     :click #(let [selector (utils/by-id "file-selector")]
+                                               (.click selector))}
+                                    {:label "Quit"
+                                     :click nw/quit}])}])
   (reset-page))

@@ -66,6 +66,11 @@
            :san San
            :fen Fen})
 
+(def Database {:key s/Str
+               :name s/Str
+               :type (s/enum :scid)
+               :opened s/Bool})
+
 (def Game {:initial-fen s/Str
            :moves [Move]
            :current-ply s/Int})
@@ -75,7 +80,12 @@
 (def schema {:theme Theme
              :view View
              :board Board
-             :game Game})
+             :game Game
+             :databases {(s/optional-key :current) Database
+                         (s/optional-key :all) {s/Str Database} }
+             :file-selector {:opened s/Bool
+                             (s/optional-key :action) (s/enum :load-pgn :open-db)
+                             (s/optional-key :accept) s/Str}})
 
 
 
@@ -108,6 +118,8 @@
    :game {:initial-fen "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
           :moves []
           :current-ply 0}
+   :databases {}
+   :file-selector {:opened false}
    })
 
 
