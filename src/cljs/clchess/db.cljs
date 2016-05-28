@@ -32,10 +32,13 @@
 
 (def Square (apply s/enum ctrl/squares))
 
+(def BoardMove [Square Square])
+
 (def SquareKeyword (apply s/enum (map keyword ctrl/squares)))
 
 (def Board {:viewOnly s/Bool
             :turnColor (s/enum "white" "black")
+            :lastMove (s/enum BoardMove nil)
             :fen s/Str
             :movable {
                       :free s/Bool
@@ -91,6 +94,7 @@
            :zoom "80%"}
    :board {:viewOnly false
            :turnColor "white"
+           :lastMove nil
            :fen "start"
            :movable {:free false
                      :color "both"

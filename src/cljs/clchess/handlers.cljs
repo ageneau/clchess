@@ -144,9 +144,15 @@
  [trim-v]
  (fn [old _]
    (let [{board :board game :game} old
-         {fen :fen color :color dest-squares :dest-squares :as state} (ctrl/compute-state game)
+         {fen :fen
+          color :color
+          dest-squares :dest-squares
+          last-move :last-move
+          :as state} (ctrl/compute-state game)
          updated-board (-> old
                            (assoc-in [:board :turnColor] color)
+                           (assoc-in [:board :lastMove] (when last-move
+                                                          [(:from last-move) (:to last-move)]))
                            (assoc-in [:board :fen] fen)
                            (assoc-in [:board :movable :dests] dest-squares))]
      (log/debug "Update board:" (:board updated-board))
