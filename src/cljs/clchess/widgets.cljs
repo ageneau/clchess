@@ -115,9 +115,10 @@
     [:table {:class "games"}
      [:thead>tr
       [:th {:colSpan "4"} "top games"]]
-     (for [game @games]
-       ^ { :key (:id game)}
-       [game-row game])]))
+     [:tbody
+      (for [game @games]
+        ^ { :key (:id game)}
+        [game-row game])]]))
 
 (defn explorer-box []
   [:div {:class "explorer_box"}
