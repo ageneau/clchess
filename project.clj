@@ -10,7 +10,7 @@
                  [org.clojure/clojurescript "1.8.51" :scope "provided"]
                  [org.clojure/core.async "0.2.374"]
                  [reagent "0.5.1"]
-                 [reagent-forms "0.5.23"]
+                 [reagent-forms "0.5.24"]
                  [reagent-utils "0.1.8"]
                  [re-frame "0.7.0"]
                  [secretary "1.2.3"]
@@ -27,8 +27,10 @@
   :plugins [[lein-cljsbuild "1.1.3" :exclusions [org.apache.commons/commons-compress]]
             [lein-figwheel "0.5.2"]
             [lein-garden "0.2.6"]
-            [lein-ancient "0.6.10"]
-            [lein-node-webkit-build "0.1.8"]]
+            [lein-node-webkit-build "0.1.8"]
+            [lein-doo "0.1.6"]]
+
+  :doo {:build "test"}
 
   :node-webkit-build {
                       :root "resources/public" ; your node-webkit app root directory
@@ -69,6 +71,12 @@
                            :optimizations :none
                            :pretty-print  true
                            :source-map true}}
+               {:id "test"
+                :source-paths ["src/cljs" "test/cljs"]
+                :compiler
+                {:output-to "resources/public/js/compiled/out/testable.js"
+                 :main clchess.test-runner
+                 :optimizations :none}}
                {:id "web"
                 :source-paths ["src/cljs" "src/web" "env/dev/cljs"]
                 :compiler {:main "clchess.dev"
