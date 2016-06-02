@@ -3,9 +3,7 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
             [secretary.core :as secretary]
-
             [goog.events :as events]
-            ;; [node-webkit.core :as nw]
             [clchess.utils :as utils]
             [clchess.board :as board]
             [clchess.handlers] ;; Do not remove this. This is needed for handler registration
@@ -42,6 +40,7 @@
                                      "clchess.subs"
                                      #_"clchess.views"
                                      "scid.*"
+                                     "clchess.node_subs"
                                      #_"clchess.ctrl"]})
   (log/set-level! :debug)
   (dispatch-sync [:initialise-db])

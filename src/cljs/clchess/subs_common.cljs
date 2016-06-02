@@ -1,9 +1,7 @@
-(ns clchess.subs
+(ns clchess.subs_common
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require [re-frame.core :refer [register-sub]]
-            [taoensso.timbre :as log]
-            [scid.game :as game]
-            [scid.base :as base]))
+            [taoensso.timbre :as log]))
 
 ;; -- Subscription handlers and registration  ---------------------------------
 
@@ -36,11 +34,3 @@
  (fn [db _]
    (log/debug "register-sub :file-selector/changed ")
    (reaction (:file-selector @db))))
-
-(register-sub
- :game/list
- (fn [db _]
-   (log/debug "register-sub :game/list ")
-   (reaction (when-let [db (get-in @db [:databases :current])]
-               (log/debug ":game-list reaction:" db)
-               (game/get-list (:key db))))))

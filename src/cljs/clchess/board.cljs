@@ -1,6 +1,5 @@
 (ns clchess.board
-    (:require [scid.core :as scid]
-              [clchess.utils :as utils]
+    (:require [clchess.utils :as utils]
               [taoensso.timbre :as log]
               [reagent.core :as reagent :refer [atom]]
               [clchess.widgets :as widgets]

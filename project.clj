@@ -61,7 +61,7 @@
 
   :cljsbuild {:builds
               [{:id "dev"
-                :source-paths ["src/cljs" "env/dev/cljs"]
+                :source-paths ["src/cljs" "src/node" "env/dev/cljs"]
                 :compiler {:main "clchess.dev"
                            :output-to "resources/public/js/compiled/clchess.js"
                            :output-dir "resources/public/js/compiled/out"
@@ -69,8 +69,18 @@
                            :optimizations :none
                            :pretty-print  true
                            :source-map true}}
+               {:id "web"
+                :source-paths ["src/cljs" "src/web" "env/dev/cljs"]
+                :compiler {:main "clchess.dev"
+                           :output-to "resources/public/js/compiled/clchess_web.js"
+                           :output-dir "resources/public/js/compiled/out-web"
+                           :asset-path   "js/compiled/out-web"
+                           :optimizations :none
+                           :pretty-print  true
+                           :source-map true}
+                }
                {:id "prod"
-                :source-paths ["src/cljs" "env/prod/cljs"]
+                :source-paths ["src/cljs" "src/node" "env/prod/cljs"]
                 :compiler {:main "clchess.prod"
                            :output-to "resources/public/js/compiled/clchess.js"
                            :optimizations :advanced

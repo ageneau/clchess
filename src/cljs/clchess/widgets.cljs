@@ -4,7 +4,6 @@
             [goog.dom :as dom]
             [goog.dom.classlist :as classlist]
             [goog.events :as events]
-            [scid.core :as scid]
             [clojure.string :as string]
             [clchess.utils :as utils :refer [percent-string]]
             [taoensso.timbre :as log]))

@@ -1,8 +1,7 @@
 (ns clchess.ctrl
-    (:require [scid.core :as scid]
-              [clchess.utils :as utils]
-              [taoensso.timbre :as log]
-              [re-frame.core :refer [subscribe dispatch dispatch-sync]]))
+  (:require [clchess.utils :as utils]
+            [taoensso.timbre :as log]
+            [re-frame.core :refer [subscribe dispatch dispatch-sync]]))
 
 (defprotocol ChessGame
   (clear [this])

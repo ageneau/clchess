@@ -5,13 +5,7 @@
             [clchess.board :as board]
             [clchess.theme :as theme]
             [clchess.widgets :as widgets]
-            [uci.core :as uci]
             [taoensso.timbre :as log]))
-
-
-(defn start-engine-button []
-  [:input {:type "button" :value "Start engine"
-           :on-click #(uci/run-engine)}])
 
 (defn open-file []
   (let [selector (utils/by-id "file-selector")]
