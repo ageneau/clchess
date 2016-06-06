@@ -7,7 +7,7 @@
   :min-lein-version "2.6.1"
 
   :dependencies [[org.clojure/clojure "1.8.0" :scope "provided"]
-                 [org.clojure/clojurescript "1.8.51" :scope "provided"]
+                 [org.clojure/clojurescript "1.9.36" :scope "provided"]
                  [org.clojure/core.async "0.2.374"]
                  [reagent "0.5.1"]
                  [reagent-forms "0.5.24"]
@@ -16,8 +16,6 @@
                  [secretary "1.2.3"]
                  [prone "1.1.1"]
                  [com.taoensso/timbre "4.3.1"]
-                 [lein-figwheel "0.5.3-2"]
-                 [org.clojure/tools.nrepl "0.2.12"]
                  [figwheel-sidecar "0.5.3-2"]
                  [com.cemerick/piggieback "0.2.1"]
                  [garden "1.3.2"]
@@ -25,9 +23,9 @@
                  [prismatic/schema "1.1.1"]]
 
   :plugins [[lein-cljsbuild "1.1.3" :exclusions [org.apache.commons/commons-compress]]
-            [lein-figwheel "0.5.2"]
+            [lein-figwheel "0.5.3-2"]
             [lein-garden "0.2.6"]
-            [lein-node-webkit-build "0.1.8"]
+            [lein-node-webkit-build "0.1.8" :exclusions [com.fasterxml.jackson.core/jackson-annotations]]
             [lein-doo "0.1.6"]]
 
   :doo {:build "test"}
@@ -59,7 +57,8 @@
    "target"]
 
   :resource-paths ["resources/public"]
-  :source-paths ["src/cljs" "env/dev/cljs"]
+
+  :source-paths ["src/cljs" "src/web" "src/node"]
 
   :cljsbuild {:builds
               [{:id "dev"
@@ -110,7 +109,7 @@
              ;; Start an nREPL server into the running figwheel process
              ;; :nrepl-port 7888
 
-             :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"]
+             ;; :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"]
 
              ;; Server Ring Handler (optional)
              ;; if you want to embed a ring handler into the figwheel http-kit
