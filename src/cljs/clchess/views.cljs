@@ -1,6 +1,6 @@
 (ns clchess.views
   (:require [reagent.core  :as reagent :refer [atom]]
-            [re-frame.core :refer [subscribe dispatch]]
+            [re-frame.core :refer [subscribe dispatch dispatch-sync]]
             [clchess.utils :as utils]
             [clchess.board :as board]
             [clchess.theme :as theme]
@@ -90,7 +90,7 @@
    [:section
     [:a "View"]
     [:div
-     [:a {:on-click #(dispatch [:menu/full-screen])} "Full screen"]]]
+     [:a {:on-click #(dispatch-sync [:menu/full-screen])} "Full screen"]]]
    [:section
     [:a "Board"]
     [:div

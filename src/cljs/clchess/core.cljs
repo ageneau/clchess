@@ -39,6 +39,7 @@
                                      "clchess.handlers"
                                      "clchess.subs"
                                      #_"clchess.views"
+                                     "clchess.handlers-common"
                                      "scid.*"
                                      "clchess.node_subs"
                                      #_"clchess.ctrl"]})

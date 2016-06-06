@@ -2,7 +2,7 @@
   (:require
    [clojure.string :as string]
    [clchess.db    :refer [default-value ls->theme theme->ls! schema]]
-   [re-frame.core :refer [dispatch register-handler path trim-v after debug]]
+   [re-frame.core :refer [dispatch dispatch-sync register-handler path trim-v after debug]]
    [schema.core   :as s]
    [clchess.theme :as theme]
    [clchess.utils :as utils]

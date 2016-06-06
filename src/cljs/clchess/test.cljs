@@ -14,6 +14,10 @@
     {:date "2014.01.10", :server "Chess.com", :move "1.e4 e5  2.d4 exd4  3.c3 dxc3  4.Bc4 cxb2  5.Bxb2 d6", :bplayer "erikelrojo", :event "Live Chess", :result "1-0", :id 772, :length 18, :wplayer "totosteel", :belo "1827", :welo "1965"}
     {:date "2005.01.22", :server "freechess.org", :move "1.e4 e6  2.d3 c5  3.g3 Nc6  4.Bg2 g6  5.Ne2 Bg7", :bplayer "xgold", :event "ICS rated blitz match", :result "=-=", :id 21, :length 60, :wplayer "Erp", :belo "1737", :welo "2098"}))
 
+(def video-file "SampleVideo_1280x720_1mb.mp4")
+
+(def test-video [:video {:id "avideo" :style {:width 400 :height 200}}
+                 [:source {:src clchess.test/test-video :type "video/mp4"}]])
 
 (def PGN_TEST
   (utils/long-str "[Event \"Casual Game\"]"
