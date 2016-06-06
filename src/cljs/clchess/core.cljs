@@ -14,8 +14,6 @@
   (:import [goog History]
            [goog.history EventType]))
 
-(enable-console-print!)
-
 ;; -- Routes and History ------------------------------------------------------
 
 ;; (defroute "/" [] (dispatch [:set-showing :all]))
