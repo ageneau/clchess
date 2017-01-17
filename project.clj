@@ -7,26 +7,26 @@
   :min-lein-version "2.6.1"
 
   :dependencies [[org.clojure/clojure "1.8.0" :scope "provided"]
-                 [org.clojure/clojurescript "1.9.36" :scope "provided"]
-                 [org.clojure/core.async "0.2.374"]
-                 [reagent "0.5.1"]
-                 [reagent-forms "0.5.24"]
-                 [reagent-utils "0.1.8"]
-                 [re-frame "0.7.0"]
+                 [org.clojure/clojurescript "1.9.456" :scope "provided"]
+                 [org.clojure/core.async "0.2.395"]
+                 [reagent "0.6.0"]
+                 [reagent-forms "0.5.28"]
+                 [reagent-utils "0.2.0"]
+                 [re-frame "0.9.1"]
                  [secretary "1.2.3"]
-                 [prone "1.1.1"]
-                 [com.taoensso/timbre "4.3.1"]
-                 [figwheel-sidecar "0.5.3-2"]
+                 [prone "1.1.4"]
+                 [com.taoensso/timbre "4.8.0"]
+                 [figwheel-sidecar "0.5.8"]
                  [com.cemerick/piggieback "0.2.1"]
                  [garden "1.3.2"]
                  [jamesmacaulay/cljs-promises "0.1.0"]
-                 [prismatic/schema "1.1.1"]]
+                 [prismatic/schema "1.1.3"]]
 
-  :plugins [[lein-cljsbuild "1.1.3" :exclusions [org.apache.commons/commons-compress]]
-            [lein-figwheel "0.5.3-2"]
-            [lein-garden "0.2.6"]
+  :plugins [[lein-cljsbuild "1.1.5" :exclusions [org.apache.commons/commons-compress]]
+            [lein-figwheel "0.5.8"]
+            [lein-garden "0.3.0"]
             [lein-node-webkit-build "0.1.8" :exclusions [com.fasterxml.jackson.core/jackson-annotations]]
-            [lein-doo "0.1.6"]]
+            [lein-doo "0.1.7"]]
 
   :doo {:build "test"}
 
@@ -90,6 +90,7 @@
                 :source-paths ["src/cljs" "src/node" "env/prod/cljs"]
                 :compiler {:main "clchess.prod"
                            :output-to "resources/public/js/compiled/clchess.js"
+                           :output-dir "resources/public/js/compiled/out-prod"
                            :optimizations :advanced
                            :pretty-print false}}]}
 
