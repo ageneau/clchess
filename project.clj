@@ -16,7 +16,7 @@
                  [secretary "1.2.3"]
                  [prone "1.1.4"]
                  [com.taoensso/timbre "4.8.0"]
-                 [figwheel-sidecar "0.5.8"]
+                 [figwheel-sidecar "0.5.9"]
                  [com.cemerick/piggieback "0.2.1"]
                  [garden "1.3.2"]
                  [jamesmacaulay/cljs-promises "0.1.0"]
@@ -24,7 +24,7 @@
                  [binaryage/devtools "0.9.0"]]
 
   :plugins [[lein-cljsbuild "1.1.5" :exclusions [org.apache.commons/commons-compress]]
-            [lein-figwheel "0.5.8"]
+            [lein-figwheel "0.5.9"]
             [lein-garden "0.3.0"]
             [lein-node-webkit-build "0.1.8" :exclusions [com.fasterxml.jackson.core/jackson-annotations]]
             [lein-doo "0.1.7"]]
@@ -45,7 +45,7 @@
                                    ;; :linux32
                                    :linux64
                                    } ; select which platforms to generate the build
-                      :nw-version "0.14.5" ; the node-webkit version to be used :latest for latest
+                      :nw-version "0.20.0" ; the node-webkit version to be used :latest for latest
                       :output "releases" ; output directory for the generated builds
                       :disable-developer-toolbar true ; this will update your package.json to remove the developer toolbar
                       :use-lein-project-version true ; update the project version using your leiningen project version
