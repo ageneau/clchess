@@ -1,36 +1,35 @@
 (ns clchess.subs_common
-  (:require-macros [reagent.ratom :refer [reaction]])
-  (:require [re-frame.core :refer [register-sub]]
+  (:require [re-frame.core :refer [reg-sub]]
             [taoensso.timbre :as log]))
 
 ;; -- Subscription handlers and registration  ---------------------------------
 
-(register-sub
+(reg-sub
  :theme
  (fn [db _]
-   (log/debug "register-sub :theme")
-   (reaction (:theme @db))))
+   (log/debug "reg-sub :theme")
+   (:theme db)))
 
-(register-sub
+(reg-sub
  :board
  (fn [db _]
-   (log/debug "register-sub :board")
-   (reaction (:board @db))))
+   (log/debug "reg-sub :board")
+   (:board db)))
 
-(register-sub
+(reg-sub
  :game/moves
  (fn [db _]
-   (log/debug "register-sub :game/moves: " (get-in @db [:game :moves]))
-   (reaction (get-in @db [:game :moves]))))
+   (log/debug "reg-sub :game/moves: " (get-in db [:game :moves]))
+   (get-in db [:game :moves])))
 
-(register-sub
+(reg-sub
  :game/promotion
  (fn [db _]
-   (log/debug "register-sub :game/promotion: " (get-in @db [:board :promotion]))
-   (reaction (get-in @db [:board :promotion]))))
+   (log/debug "reg-sub :game/promotion: " (get-in db [:board :promotion]))
+   (get-in db [:board :promotion])))
 
-(register-sub
+(reg-sub
  :file-selector/changed
  (fn [db _]
-   (log/debug "register-sub :file-selector/changed ")
-   (reaction (:file-selector @db))))
+   (log/debug "reg-sub :file-selector/changed ")
+   (:file-selector db)))

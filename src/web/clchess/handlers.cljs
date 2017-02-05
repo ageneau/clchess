@@ -1,11 +1,11 @@
 (ns clchess.handlers
   (:require
-   [re-frame.core :refer [dispatch register-handler path trim-v after debug]]
+   [re-frame.core :refer [dispatch reg-event-db path trim-v after debug]]
    [clchess.handlers-common]
    [clchess.utils :as utils]
    [taoensso.timbre :as log]))
 
-(register-handler
+(reg-event-db
  :menu/full-screen
  [(path :view)
   trim-v]
@@ -18,7 +18,7 @@
      (utils/full-screen-change #(dispatch [:view/full-screen-changed %]))
      old)))
 
-(register-handler
+(reg-event-db
  :view/full-screen-changed
  [(path :view)
   trim-v]

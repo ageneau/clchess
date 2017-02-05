@@ -2,14 +2,14 @@
   (:require
    [clchess.handlers-common]
    [clojure.string :as string]
-   [re-frame.core :refer [dispatch register-handler path trim-v after debug]]
+   [re-frame.core :refer [dispatch reg-event-db path trim-v after debug]]
    [node-webkit.core :as nw]
    [clchess.utils :as utils]
    [clchess.ctrl :as ctrl]
    [scid.base :as chessdb]
    [taoensso.timbre :as log]))
 
-(register-handler
+(reg-event-db
  :db/open
  [(path :databases)
   trim-v]
@@ -25,7 +25,7 @@
      databases)))
 
 
-(register-handler
+(reg-event-db
  :menu/full-screen
  [(path :view)
   trim-v]
@@ -38,7 +38,7 @@
        (.leaveFullscreen window))
      (assoc old :is-full-screen new-state))))
 
-(register-handler
+(reg-event-db
  :menu/quit
  [trim-v]
  (fn [old _]

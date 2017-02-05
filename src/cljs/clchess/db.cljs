@@ -2,7 +2,9 @@
   (:require [cljs.reader]
             [clchess.theme :as theme]
             [clchess.ctrl :as ctrl]
-            [schema.core  :as s :include-macros true]))
+            [schema.core  :as s :include-macros true]
+            [re-frame.core :as re-frame]
+            [taoensso.timbre :as log]))
 
 
 ;; -- Schema -----------------------------------------------------------------
@@ -131,16 +133,23 @@
 ;; But we are not to load the setting for the "showing" filter. Just the todos.
 ;;
 
-(def lsk "clchess")     ;; localstore key
+(def ls-key "clchess")     ;; localstore key
 
-(defn ls->theme
-  "Read in theme from LS, and process into a map we can merge into app-db."
-  []
-  (some->> (.getItem js/localStorage lsk)
-           (cljs.reader/read-string)   ;; stored as an EDN map.
-           (hash-map :theme)))         ;; access via the :theme key
-
-(defn theme->ls!
+(defn themes->local-store
   "Puts theme into localStorage"
   [theme]
-  (.setItem js/localStorage lsk (str theme)))   ;; sorted-map writen as an EDN map
+  (log/debug "themes->local-store")
+  (.setItem js/localStorage ls-key (str theme)))   ;; sorted-map writen as an EDN map
+
+;; register a coeffect handler which will load a value from localstore
+;; To see it used look in events.clj at the event handler for `:initialise-db`
+(re-frame/reg-cofx
+ :local-store-themes
+ (fn [cofx _]
+   "Read in themes from localstore, and process into a map we can merge into app-db."
+   (assoc cofx :local-store-themes
+          (into (sorted-map)
+                (some->> (.getItem js/localStorage ls-key)
+                         (cljs.reader/read-string)       ;; stored as an EDN map.
+                         (hash-map :theme)               ;; access via the :theme key
+                         )))))
