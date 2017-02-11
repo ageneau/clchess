@@ -7,12 +7,12 @@
   :min-lein-version "2.6.1"
 
   :dependencies [[org.clojure/clojure "1.8.0" :scope "provided"]
-                 [org.clojure/clojurescript "1.9.456" :scope "provided"]
+                 [org.clojure/clojurescript "1.9.473" :scope "provided"]
                  [org.clojure/core.async "0.2.395"]
                  [reagent "0.6.0"]
                  [reagent-forms "0.5.28"]
                  [reagent-utils "0.2.0"]
-                 [re-frame "0.9.1"]
+                 [re-frame "0.9.2"]
                  [secretary "1.2.3"]
                  [prone "1.1.4"]
                  [com.taoensso/timbre "4.8.0"]
@@ -20,7 +20,8 @@
                  [com.cemerick/piggieback "0.2.1"]
                  [garden "1.3.2"]
                  [jamesmacaulay/cljs-promises "0.1.0"]
-                 [prismatic/schema "1.1.3"]]
+                 [prismatic/schema "1.1.3"]
+                 [binaryage/devtools "0.9.0"]]
 
   :plugins [[lein-cljsbuild "1.1.5" :exclusions [org.apache.commons/commons-compress]]
             [lein-figwheel "0.5.8"]

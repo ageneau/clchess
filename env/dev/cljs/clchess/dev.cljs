@@ -1,7 +1,8 @@
 (ns ^:figwheel-no-load clchess.dev
   (:require [clchess.core :as core]
             [figwheel.client :as figwheel :include-macros true]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [devtools.core :as devtools]))
 
 (enable-console-print!)
 
@@ -10,5 +11,7 @@
   :jsload-callback #(do
                       (log/info "Figwheel reload")
                       (core/reset-page)))
+
+(devtools/install!)
 
 (core/init!)
