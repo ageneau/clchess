@@ -20,7 +20,6 @@
                  [com.cemerick/piggieback "0.2.1"]
                  [garden "1.3.2"]
                  [jamesmacaulay/cljs-promises "0.1.0"]
-                 [prismatic/schema "1.1.3"]
                  [binaryage/devtools "0.9.0"]]
 
   :plugins [[lein-cljsbuild "1.1.5" :exclusions [org.apache.commons/commons-compress]]

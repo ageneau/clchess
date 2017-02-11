@@ -1,10 +1,9 @@
 (ns clchess.events-common
   (:require
    [clojure.string :as string]
-   [clchess.db    :refer [default-value schema themes->local-store]]
+   [clchess.db    :refer [default-value themes->local-store]]
    [re-frame.core :refer [dispatch dispatch-sync reg-event-db reg-event-fx inject-cofx path trim-v after debug]]
-   [schema.core   :as s]
-   [cljs.spec :as spec]
+   [cljs.spec :as s]
    [clchess.theme :as theme]
    [clchess.utils :as utils]
    [clchess.ctrl :as ctrl]
@@ -16,22 +15,21 @@
 ;;
 
 (defn check-and-throw
-  "throw an exception if db doesn't match the schema."
-  [a-schema db]
-  (log/debug "check-and-throw, DB:" db)
-  (if-let [problems  (s/check a-schema db)]
-    (throw (js/Error. (str "schema check failed: " problems)))))
+  "throw an exception if db doesn't match the spec"
+  [a-spec db]
+  (when-not (s/valid? a-spec db)
+    (throw (ex-info (str "spec check failed: " (s/explain-str a-spec db)) {}))))
 
 ;; Event handlers change state, that's their job. But what happens if there's
 ;; a bug which corrupts app state in some subtle way? This interceptor is run after
-;; each event handler has finished, and it checks app-db against a schema.  This
+;; each event handler has finished, and it checks app-db against a spec.  This
 ;; helps us detect event handler bugs early.
-(def check-schema-interceptor (after (partial check-and-throw schema)))
+(def check-spec-interceptor (after (partial check-and-throw :clchess.db/db)))
 
 (def ->local-store (after themes->local-store))
 
 ;; interceptor for any handler that manipulates themes
-(def theme-interceptors [check-schema-interceptor ;; ensure the schema is still valid
+(def theme-interceptors [check-spec-interceptor ;; ensure the spec is still valid
                          (path :theme)   ;; 1st param to handler will be value from this path
                          ->local-store            ;; write to localstore each time
                          (when ^boolean js/goog.DEBUG debug)       ;; look in your browser console
@@ -43,8 +41,8 @@
 (reg-event-fx                 ;; On app startup, ceate initial state
   :initialise-db                  ;; event id being handled
   [(inject-cofx :local-store-themes)
-   check-schema-interceptor
-   ]                 ;; afterwards: check that app-db matches the schema
+   check-spec-interceptor
+   ]                 ;; afterwards: check that app-db matches the spec
   (fn [{:keys [db local-store-themes]} _]                    ;; the handler being registered
     (log/debug "Theme:" local-store-themes "DB: " (merge-with merge default-value  {:theme local-store-themes}))
     {:db (merge-with merge default-value  {:theme local-store-themes}) }))  ;; all hail the new state

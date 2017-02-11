@@ -2,23 +2,22 @@
   (:require [cljs.reader]
             [clchess.theme :as theme]
             [clchess.ctrl :as ctrl]
-            [schema.core  :as s :include-macros true]
             [cljs.spec :as spec]
             [re-frame.core :as re-frame]
             [taoensso.timbre :as log]))
 
 
-;; -- Schema -----------------------------------------------------------------
+;; -- Spec --------------------------------------------------------------------
 ;;
-;; This is a Prismatic Schema which documents the structure of app-db
-;; See: https://github.com/Prismatic/schema
+;; This is a clojure.spec specification for the value in app-db. It is like a
+;; Schema. See: http://clojure.org/guides/spec
 ;;
-;; The value in app-db should ALWAYS match this schema. Now, the value in
-;; app-db can ONLY be changed by event handlers so, after each event handler
-;; has run, we re-check that app-db still matches this schema.
+;; The value in app-db should always match this spec. Only event handlers
+;; can change the value in app-db so, after each event handler
+;; has run, we re-check app-db for correctness (compliance with the Schema).
 ;;
-;; How is this done? Look in handlers.cljs and you'll notice that all handers
-;; have an "after" middleware which does the schema re-check.
+;; How is this done? Look in events.cljs and you'll notice that all handers
+;; have an "after" interceptor which does the spec re-check.
 ;;
 ;; None of this is strictly necessary. It could be omitted. But we find it
 ;; good practice.
@@ -85,45 +84,6 @@
                                                  :chessground/movable]))
 
 (spec/def :chess/san string?)
-
-
-(def Theme {:is-2d s/Bool
-            :theme (apply s/enum theme/theme-names)
-            :data-theme (apply s/enum theme/data-themes)
-            :data-theme-3d (apply s/enum theme/data-themes-3d)
-            :data-set (apply s/enum theme/data-sets)
-            :data-set-3d (apply s/enum theme/data-sets-3d)
-            :background-img s/Str
-            :zoom s/Str
-            })
-
-(def Square (apply s/enum ctrl/squares))
-
-(def BoardMove [Square Square])
-
-(def SquareKeyword (apply s/enum (map keyword ctrl/squares)))
-
-(def Board {:viewOnly s/Bool
-            :turnColor (s/enum "white" "black")
-            :lastMove (s/enum BoardMove nil)
-            :fen s/Str
-            :movable {
-                      :free s/Bool
-                      :color (s/enum "white" "black" "both")
-                      :premove s/Bool
-                      :dests {SquareKeyword [Square]}
-                      }
-            :promotion {:show s/Bool
-                        (s/optional-key :from) Square
-                        (s/optional-key :to) Square
-                        (s/optional-key :player) (s/enum "white" "black")}})
-
-(def Piece (s/enum "q" "k" "b" "r"))
-
-(def San s/Str)
-
-(def Fen s/Str)
-
 (spec/def :chess/color #{"w" "b"})
 (spec/def :chess/from :board/square)
 (spec/def :chess/to :board/square)
@@ -140,15 +100,6 @@
                                           :chess/san
                                           :chess/fen]))
 
-(def Move {:color (s/enum "w" "b")
-           :from Square
-           :to Square
-           :flags s/Str
-           :piece Piece
-           :promotion Piece
-           :san San
-           :fen Fen})
-
 (spec/def :chessdb/key string?)
 (spec/def :chessdb/name string?)
 (spec/def :chessdb/type #{:scid})
@@ -159,11 +110,6 @@
                                                 :chessdb/type
                                                 :chessdb/opened]))
 
-(def Database {:key s/Str
-               :name s/Str
-               :type (s/enum :scid)
-               :opened s/Bool})
-
 (spec/def :chess/initial-fen :chess/fen)
 (spec/def :chess/ply integer?)
 (spec/def :chess/current-ply :chess/ply)
@@ -172,11 +118,6 @@
 (spec/def :chess/game (spec/keys :req-un [:chess/initial-fen
                                           :chess/moves
                                           :chess/current-ply]))
-
-
-(def Game {:initial-fen s/Str
-           :moves [Move]
-           :current-ply s/Int})
 
 (spec/def ::is-full-screen boolean?)
 
@@ -202,20 +143,6 @@
                                    :chess/game
                                    :chessdb/databases
                                    ::file-selector]))
-
-(def View {:is-full-screen s/Bool})
-
-(def schema {:theme Theme
-             :view View
-             :board Board
-             :game Game
-             :databases {(s/optional-key :current) Database
-                         (s/optional-key :all) {s/Str Database} }
-             :file-selector {:opened s/Bool
-                             (s/optional-key :action) (s/enum :load-pgn :open-db)
-                             (s/optional-key :accept) s/Str}})
-
-
 
 ;; -- Default app-db Value  ---------------------------------------------------
 ;;
