@@ -3,6 +3,7 @@
             [clchess.theme :as theme]
             [clchess.ctrl :as ctrl]
             [schema.core  :as s :include-macros true]
+            [cljs.spec :as spec]
             [re-frame.core :as re-frame]
             [taoensso.timbre :as log]))
 
@@ -21,6 +22,70 @@
 ;;
 ;; None of this is strictly necessary. It could be omitted. But we find it
 ;; good practice.
+
+(spec/def :theme/is-2d boolean?)
+(spec/def :theme/theme theme/theme-names)
+(spec/def :theme/data-theme theme/data-themes)
+(spec/def :theme/data-theme-3d theme/data-themes-3d)
+(spec/def :theme/data-set theme/data-sets)
+(spec/def :theme/data-set-3d theme/data-sets-3d)
+(spec/def :theme/background-img (spec/nilable string?))
+(spec/def :theme/zoom string?)
+
+
+(spec/def ::theme (spec/keys :req-un [:theme/is-2d
+                                      :theme/theme
+                                      :theme/data-theme
+                                      :theme/data-theme-3d
+                                      :theme/data-set
+                                      :theme/data-set-3d
+                                      :theme/background-img
+                                      :theme/zoom]
+                             ))
+
+(spec/def :board/square ctrl/squares)
+(spec/def :board/move (spec/coll-of :board/square :kind vector? :count 2 :distinct true))
+
+(spec/def :board/square-kw (into #{} (map keyword ctrl/squares)))
+
+(spec/def :board/piece #{"q" "k" "b" "r"})
+
+(spec/def :board/turn #{"white" "black"})
+(spec/def :board/dests (spec/map-of :board/square (spec/coll-of :board/square)))
+(spec/def :chess/fen string?)
+
+(spec/def :chessground/viewOnly boolean?)
+(spec/def :chessground/turnColor :board/turn)
+(spec/def :chessground/lastMove (spec/nilable :board/move))
+(spec/def :chessground/color #{"white" "black" "both"})
+(spec/def :chessground/fen :chess/fen)
+(spec/def :chessground/free boolean?)
+(spec/def :chessground/dests :board/dests)
+
+(spec/def :chessground/movable (spec/keys :req-un [:chessground/free
+                                                   :chessground/color
+                                                   :chessground/premove
+                                                   :chessground/dests]))
+(spec/def :chessground/show boolean?)
+(spec/def :chessground/from :board/square)
+(spec/def :chessground/to :board/square)
+(spec/def :chessground/player :board/turn)
+
+
+(spec/def :chessground/promotion (spec/keys :req-un [:chessground/show]
+                                            :opt-un [:chessground/from
+                                                     :chessground/to
+                                                     :chessground/player]))
+
+(spec/def :chessground/board (spec/keys :req-un [:chessground/viewOnly
+                                                 :chessground/turnColor
+                                                 :chessground/lastMove
+                                                 :chessground/fen
+                                                 :chessground/promotion
+                                                 :chessground/movable]))
+
+(spec/def :chess/san string?)
+
 
 (def Theme {:is-2d s/Bool
             :theme (apply s/enum theme/theme-names)
@@ -59,6 +124,22 @@
 
 (def Fen s/Str)
 
+(spec/def :chess/color #{"w" "b"})
+(spec/def :chess/from :board/square)
+(spec/def :chess/to :board/square)
+(spec/def :chess/flags string?)
+(spec/def :chess/piece :board/piece)
+(spec/def :chess/promotion :board/piece)
+
+(spec/def :chess/move (spec/keys :req-un [:chess/color
+                                          :chess/from
+                                          :chess/to
+                                          :chess/flags
+                                          :chess/piece
+                                          :chess/promotion
+                                          :chess/san
+                                          :chess/fen]))
+
 (def Move {:color (s/enum "w" "b")
            :from Square
            :to Square
@@ -68,14 +149,59 @@
            :san San
            :fen Fen})
 
+(spec/def :chessdb/key string?)
+(spec/def :chessdb/name string?)
+(spec/def :chessdb/type #{:scid})
+(spec/def :chessdb/opened boolean)
+
+(spec/def :chessdb/database (spec/keys :req-un [:chessdb/key
+                                                :chessdb/name
+                                                :chessdb/type
+                                                :chessdb/opened]))
+
 (def Database {:key s/Str
                :name s/Str
                :type (s/enum :scid)
                :opened s/Bool})
 
+(spec/def :chess/initial-fen :chess/fen)
+(spec/def :chess/ply integer?)
+(spec/def :chess/current-ply :chess/ply)
+(spec/def :chess/moves (spec/coll-of :chess/move :kind vector?))
+
+(spec/def :chess/game (spec/keys :req-un [:chess/initial-fen
+                                          :chess/moves
+                                          :chess/current-ply]))
+
+
 (def Game {:initial-fen s/Str
            :moves [Move]
            :current-ply s/Int})
+
+(spec/def ::is-full-screen boolean?)
+
+(spec/def ::view (spec/keys :req-un [::is-full-screen]))
+
+(spec/def :chessdb/current :chessdb/database)
+(spec/def :chessdb/all (spec/map-of string? :chessdb/database))
+
+(spec/def :chessdb/databases (spec/keys :req-opt [:chessdb/current
+                                                  :chessdb/all]))
+
+(spec/def :file-selector/opened boolean?)
+(spec/def :file-selector/action #{:load-pgn :open-db})
+(spec/def :file-selector/accept string?)
+
+(spec/def ::file-selector (spec/keys :req-un [:file-selector/opened]
+                                     :opt-un [:file-selector/action
+                                              :file-selector/accept]))
+
+(spec/def ::db (spec/keys :req-un [::theme
+                                   ::view
+                                   :board/board
+                                   :chess/game
+                                   :chessdb/databases
+                                   ::file-selector]))
 
 (def View {:is-full-screen s/Bool})
 

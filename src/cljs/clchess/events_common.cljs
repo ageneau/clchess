@@ -4,6 +4,7 @@
    [clchess.db    :refer [default-value schema themes->local-store]]
    [re-frame.core :refer [dispatch dispatch-sync reg-event-db reg-event-fx inject-cofx path trim-v after debug]]
    [schema.core   :as s]
+   [cljs.spec :as spec]
    [clchess.theme :as theme]
    [clchess.utils :as utils]
    [clchess.ctrl :as ctrl]

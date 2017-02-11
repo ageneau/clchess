@@ -15,8 +15,8 @@
   (move [this orig dest]))
 
 (def ^:const squares
-  (let [chess (js/Chess.)]
-    (js->clj (.-SQUARES chess))))
+  (into #{} (let [chess (js/Chess.)]
+              (js->clj (.-SQUARES chess)))))
 
 (defn ^:private color [chess]
   (if (= (.turn chess) "w") "white" "black"))
