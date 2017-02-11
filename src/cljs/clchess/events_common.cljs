@@ -1,4 +1,4 @@
-(ns clchess.handlers-common
+(ns clchess.events-common
   (:require
    [clojure.string :as string]
    [clchess.db    :refer [default-value schema themes->local-store]]

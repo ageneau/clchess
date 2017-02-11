@@ -1,6 +1,6 @@
-(ns clchess.handlers
+(ns clchess.events
   (:require
-   [clchess.handlers-common]
+   [clchess.events-common]
    [clojure.string :as string]
    [re-frame.core :refer [dispatch reg-event-db path trim-v after debug]]
    [node-webkit.core :as nw]

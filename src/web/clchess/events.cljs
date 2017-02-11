@@ -1,7 +1,7 @@
-(ns clchess.handlers
+(ns clchess.events
   (:require
    [re-frame.core :refer [dispatch reg-event-db path trim-v after debug]]
-   [clchess.handlers-common]
+   [clchess.events-common]
    [clchess.utils :as utils]
    [taoensso.timbre :as log]))
 

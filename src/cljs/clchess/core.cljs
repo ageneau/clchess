@@ -6,7 +6,7 @@
             [goog.events :as events]
             [clchess.utils :as utils]
             [clchess.board :as board]
-            [clchess.handlers] ;; Do not remove this. This is needed for handler registration
+            [clchess.events] ;; Do not remove this. This is needed for handler registration
             [clchess.subs] ;; Do not remove this. This is needed for subscription handler registration
             [clchess.views]
             [clchess.theme :as theme]
@@ -34,10 +34,10 @@
 
 (defn reset-page []
   (log/merge-config! {:ns-whitelist [#_"clchess.board"
-                                     "clchess.handlers"
+                                     "clchess.events"
                                      "clchess.subs"
                                      #_"clchess.views"
-                                     "clchess.handlers-common"
+                                     "clchess.events-common"
                                      "scid.*"
                                      "clchess.node_subs"
                                      #_"clchess.ctrl"]})
