@@ -1,0 +1,25 @@
+{
+  "name": "clchess",
+  "version": "1.0.0",
+  "description": "Chess application written in Clojurescript. Uses NW.js.",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "finalhandler": "^0.5.1",
+    "http": "0.0.0",
+    "serve-static": "^1.11.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/sageneau/clchess.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/sageneau/clchess#readme"
+}
