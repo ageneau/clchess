@@ -44,7 +44,6 @@
    check-spec-interceptor
    ]                 ;; afterwards: check that app-db matches the spec
   (fn [{:keys [db local-store-themes]} _]                    ;; the handler being registered
-    (log/debug "Theme:" local-store-themes "DB: " (merge-with merge default-value  {:theme local-store-themes}))
     {:db (merge-with merge default-value  {:theme local-store-themes}) }))  ;; all hail the new state
 
                                   ;; usage:  (dispatch [:set-is-2d  true])
@@ -229,3 +228,11 @@
               (assoc-in [:board :promotion] {:show false}))
       :dispatch [:game/update-board]})))
 
+(reg-event-db
+ :view/resized
+ [(path :view)
+  trim-v]
+ (fn [db _]
+   (let [size {:width (.-innerWidth js/window)
+               :height (.-innerHeight js/window)}]
+     (assoc db :size size))))

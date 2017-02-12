@@ -24,36 +24,40 @@
            (assoc-in [:all key] new)))
      databases)))
 
-
 (reg-fx
- :request-fullscreen
+ :view/request-fullscreen
  (fn  [_]
    (.enterFullscreen (nw/window))))
 
 (reg-fx
- :exit-fullscreen
+ :view/exit-fullscreen
  (fn [_]
    (.leaveFullscreen (nw/window))))
+
+(reg-fx
+ :app/exit
+ (fn [_]
+   (nw/quit)))
 
 (reg-event-fx
  :view/toggle-fullscreen
  [(path :view)
   trim-v]
  (fn [cofx _]
+   (log/debug "toggle-fullscreen")
    (let [is-fullscreen (:is-fullscreen (:db cofx))
          window (nw/window)
          new-state (not is-fullscreen)]
      (log/debug "Toggle full screen: " is-fullscreen)
      (if new-state
        {:db (assoc (:db cofx) :is-fullscreen new-state)
-        :request-fullscreen []}
+        :view/request-fullscreen nil}
        {:db (assoc (:db cofx) :is-fullscreen new-state)
-        :exit-fullscreen []}))))
+        :view/exit-fullscreen nil}))))
 
-(reg-event-db
+(reg-event-fx
  :menu/quit
  [trim-v]
- (fn [old _]
+ (fn [cofx _]
    (log/debug "Quit")
-   (nw/quit)
-   old))
+   {:app/exit nil}))

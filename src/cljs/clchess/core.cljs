@@ -32,8 +32,15 @@
 (defn mount-root []
   (reagent/render [clchess.views/clchess-app] (utils/by-id "app")))
 
+(defn listen-to-events []
+  (log/debug "listen-to-events")
+  (.addEventListener js/window "resize"
+                     #(dispatch [:view/resized]))
+  (utils/fullscreen-change #(dispatch [:view/fullscreen-changed %])))
+
 (defn reset-page []
-  (log/merge-config! {:ns-whitelist [#_"clchess.board"
+  (log/merge-config! {:ns-whitelist ["clchess.core"
+                                     #_"clchess.board"
                                      "clchess.events"
                                      "clchess.subs"
                                      #_"clchess.views"
@@ -46,13 +53,8 @@
   (dispatch-sync [:game/update-board])
   (let [theme (subscribe [:theme])]
     (theme/init-theme @theme))
-  (mount-root))
+  (mount-root)
+  (listen-to-events))
 
 (defn init! []
-  #_(nw/menubar! [{:label "File"
-                 :submenu (nw/menu [{:label "Open"
-                                     :click #(let [selector (utils/by-id "file-selector")]
-                                               (.click selector))}
-                                    {:label "Quit"
-                                     :click nw/quit}])}])
   (reset-page))

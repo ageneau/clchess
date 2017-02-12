@@ -120,8 +120,13 @@
                                           :chess/current-ply]))
 
 (spec/def ::is-fullscreen boolean?)
+(spec/def ::width pos-int?)
+(spec/def ::height pos-int?)
+(spec/def :window/size (spec/keys :req [::width
+                                        ::height]))
 
-(spec/def ::view (spec/keys :req-un [::is-fullscreen]))
+(spec/def ::view (spec/keys :req-un [::is-fullscreen
+                                     (spec/nilable :window/size)]))
 
 (spec/def :chessdb/current :chessdb/database)
 (spec/def :chessdb/all (spec/map-of string? :chessdb/database))
@@ -204,5 +209,4 @@
           (into (sorted-map)
                 (some->> (.getItem js/localStorage ls-key)
                          (cljs.reader/read-string)       ;; stored as an EDN map.
-                         (hash-map :theme)               ;; access via the :theme key
                          )))))

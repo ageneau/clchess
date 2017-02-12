@@ -6,19 +6,14 @@
    [taoensso.timbre :as log]))
 
 (reg-fx
- :request-fullscreen
+ :view/request-fullscreen
  (fn  [_]
    (utils/request-fullscreen (utils/by-id "app"))))
 
 (reg-fx
- :exit-fullscreen
+ :view/exit-fullscreen
  (fn [_]
    (utils/exit-fullscreen)))
-
-(reg-fx
- :fullscreen-change
- (fn [_]
-   (utils/fullscreen-change #(dispatch [:view/fullscreen-changed %]))))
 
 (reg-event-fx
  :view/toggle-fullscreen
@@ -29,15 +24,13 @@
          new-state (not is-fullscreen)]
      (log/debug "Toggle full screen: " is-fullscreen ", " (utils/get-viewport-size))
      (if new-state
-       {:request-fullscreen
-        :fullscreen-change}
-       {:exit-fullscreen
-        :fullscreen-change}))))
+       {:view/request-fullscreen nil}
+       {:view/exit-fullscreen nil}))))
 
 (reg-event-db
  :view/fullscreen-changed
  [(path :view)
   trim-v]
- (fn [{is-fullscreen :is-fullscreen :as old} [new-value]]
+ (fn [{is-fullscreen :is-fullscreen :as db} [new-value]]
    (log/debug "Full screen changed: " is-fullscreen ", " new-value)
-   (assoc old :is-fullscreen new-value)))
+   (assoc db :is-fullscreen new-value)))
