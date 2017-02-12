@@ -58,101 +58,102 @@
   ;; Also, the use of the 'trim-v' interceptor means we can omit
   ;; the leading underscore from the 2nd parameter (event vector).
   (fn [old [new-val]]    ;; handler
+    (log/debug "In set-is-2d:" old)
     (assoc old :is-2d new-val)))         ;; return new state for the path
 
-(reg-event-db
+(reg-event-fx
  :game/next-move
  [(path :game)
   trim-v]
- (fn [old _]
-   (let [{ current-ply :current-ply moves :moves } old]
+ (fn [cofx _]
+   (let [{ current-ply :current-ply moves :moves } (:db cofx)]
      (if (= current-ply (count moves))
        (do
          (log/debug "End of game")
-         old)
+         {:db (:db cofx)})
        (do
-         (log/debug "Next move:" old)
-         (dispatch [:game/update-board])
-         (assoc old :current-ply (inc (:current-ply old))))))))
+         (log/debug "Next move:" (:db cofx))
+         {:db (assoc (:db cofx) :current-ply (inc (:current-ply (:db cofx))))
+          :dispatch [:game/update-board]})))))
 
-(reg-event-db
+(reg-event-fx
  :game/previous-move
  [(path :game)
   trim-v]
- (fn [old _]
-   (let [{ current-ply :current-ply moves :moves } old]
+ (fn [cofx _]
+   (let [{ current-ply :current-ply moves :moves } (:db cofx)]
      (if (= current-ply 0)
        (do
          (log/debug "Beggining of game")
-         old)
+         {:db (:db cofx)})
        (do
-         (log/debug "Previous move:" old)
-         (dispatch [:game/update-board])
-         (assoc old :current-ply (dec (:current-ply old))))))))
+         (log/debug "Previous move:" (:db cofx))
+         {:db (assoc (:db cofx) :current-ply (dec (:current-ply (:db cofx))))
+          :dispatch [:game/update-board]})))))
 
-(reg-event-db
+(reg-event-fx
  :game/first-move
  [(path :game)
   trim-v]
- (fn [old _]
-   (log/debug "First move:" old)
-   (dispatch [:game/update-board])
-   (assoc old :current-ply 0)))
+ (fn [cofx _]
+   (log/debug "First move:" (:db cofx))
+   {:db (assoc (:db cofx) :current-ply 0)
+    :dispatch [:game/update-board]}))
 
-(reg-event-db
+(reg-event-fx
  :game/last-move
  [(path :game)
   trim-v]
- (fn [old _]
-   (let [{ current-ply :current-ply moves :moves } old ]
-     (log/debug "Last move:" old)
-     (dispatch [:game/update-board])
-     (assoc old :current-ply (count moves)))))
+ (fn [cofx _]
+   (let [{ current-ply :current-ply moves :moves } (:db cofx) ]
+     (log/debug "Last move:" (:db cofx))
+     {:db (assoc (:db cofx) :current-ply (count moves))
+      :dispatch [:game/update-board]})))
 
 (reg-event-db
  :game/set-board
  [(path :board)
   trim-v]
- (fn [old [board-state]]
-   (assoc old :board board-state)))
+ (fn [db [board-state]]
+   (assoc db :board board-state)))
 
-(reg-event-db
+(reg-event-fx
  :game/board-move
  [trim-v]
- (fn [old [from to { promoting :promoting player :player :as flags } :as move]]
-   (let [game (:game old)
-         board (:board old)
+ (fn [cofx [from to { promoting :promoting player :player :as flags } :as move]]
+   (let [game (:game (:db cofx))
+         board (:board (:db cofx))
          { current-ply :current-ply moves :moves } game]
      (log/debug "Board move:" from "," to "," current-ply ", flags:" flags ", promoting: " promoting)
      (cond
        (not= current-ply (count moves))
        (do
          (log/debug "Not at the end of the move list")
-         old)
+         {:db (:db cofx)})
 
        promoting
        (let [promotion {:show true :from from :to to :player player}]
-         (log/debug "Promoting:" (:board (assoc-in old [:board :promotion] promotion)))
-         (assoc-in old [:board :promotion] promotion))
+         (log/debug "Promoting:" (:board (assoc-in (:db cofx) [:board :promotion] promotion)))
+         {:db (assoc-in (:db cofx) [:board :promotion] promotion)})
 
        :else
        (let [game-state (ctrl/make-move game from to)
-             updated-state (update-in old [:game] merge game-state)]
+             updated-state (update-in (:db cofx) [:game] merge game-state)]
          (log/debug "Make move:" game-state)
-         (dispatch [:game/update-board])
-         updated-state)))))
+         {:db updated-state
+          :dispatch [:game/update-board]})))))
 
 (reg-event-db
  :game/update-board
  [trim-v]
- (fn [old _]
-   (let [{board :board game :game} old
+ (fn [db _]
+   (let [{board :board game :game} db
          {fen :fen
           color :color
           dest-squares :dest-squares
           last-move :last-move
           :as state} (ctrl/compute-state game)
-         updated-board (-> old
+         updated-board (-> db
                            (assoc-in [:board :turnColor] color)
                            (assoc-in [:board :lastMove] (when last-move
                                                           [(:from last-move) (:to last-move)]))
@@ -161,71 +162,70 @@
      (log/debug "Update board:" (:board updated-board))
      updated-board)))
 
-(reg-event-db
+(reg-event-fx
  :menu/open-db
  [trim-v]
- (fn [old _]
+ (fn [cofx _]
    (log/debug "Open DB")
-   (dispatch [:file/open-selector])
-   (-> old
-       (assoc-in [:file-selector :action] :open-db)
-       (assoc-in [:file-selector :accept] (string/join "," [".si4" ".si3" ".pgn" ".PGN" ".pgn.gz"])))))
+   {:db (-> (:db cofx)
+            (assoc-in [:file-selector :action] :open-db)
+            (assoc-in [:file-selector :accept] (string/join "," [".si4" ".si3" ".pgn" ".PGN" ".pgn.gz"])))
+    :dispatch [:file/open-selector]}))
 
-(reg-event-db
+(reg-event-fx
  :menu/load-pgn
  [trim-v]
- (fn [old _]
+ (fn [cofx _]
    (log/debug "Load pgn")
-   (dispatch [:file/open-selector])
-   (-> old
-       (assoc-in [:file-selector :action] :load-pgn)
-       (assoc-in [:file-selector :accept] ".pgn"))))
+   {:db (-> (:db cofx)
+            (assoc-in [:file-selector :action] :load-pgn)
+            (assoc-in [:file-selector :accept] ".pgn"))
+    :dispatch [:file/open-selector]}))
 
 (reg-event-db
  :menu/reset-board
  [trim-v]
- (fn [old _]
+ (fn [db _]
    (log/debug "Reset board")
-   old))
+   db))
 
 (reg-event-db
  :file/open-selector
  [(path :file-selector)
   trim-v]
- (fn [{opened :opened :as old} _]
+ (fn [{opened :opened :as db} _]
    (views/open-file)
-   (assoc old :opened true)))
+   (assoc db :opened true)))
 
-(reg-event-db
+(reg-event-fx
  :file/changed
  [trim-v]
- (fn [db [action file]]
+ (fn [cofx [action file]]
    (log/debug "File changed: " action ", " file)
-   (let [db (assoc-in db [:file-selector :opened] false)]
+   (let [db (assoc-in (:db cofx) [:file-selector :opened] false)]
      (case action
        :load-pgn
        (let [{game :game} db
              file (utils/read-file file)
              new-state (ctrl/load-pgn game file)]
-         (dispatch [:game/update-board])
-         (update-in db [:game] merge new-state))
+         {:db (update-in db [:game] merge new-state)
+          :dispatch [:game/update-board]})
 
        :open-db
-       (do (dispatch [:db/open file])
-           db)))))
+       {:dispatch [:db/open file]}))))
 
-(reg-event-db
+(reg-event-fx
  :game/promote-to
  [trim-v]
- (fn [old [piece]]
+ (fn [cofx [piece]]
    (log/debug "Promote to: " piece)
-   (let [game (:game old)
-         board (:board old)
+   (let [game (:game (:db cofx))
+         board (:board (:db cofx))
          {from :from to :to } (:promotion board)
          new-state (ctrl/make-move game from to :promotion piece)]
-     (log/debug "Make move:" new-state ", NEW STATE:" (update-in old [:game] merge new-state))
-     (dispatch [:game/update-board])
-     (-> old
-         (update-in [:game] merge new-state)
-         (assoc-in [:board :promotion] {:show false})))))
+     (log/debug "Make move:" new-state ", NEW STATE:" (update-in (:db cofx) [:game] merge new-state))
+     {:db (-> (:db cofx)
+              (update-in [:game] merge new-state)
+              (assoc-in [:board :promotion] {:show false}))
+      :dispatch [:game/update-board]})))
 

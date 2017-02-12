@@ -90,7 +90,7 @@
    [:section
     [:a "View"]
     [:div
-     [:a {:on-click #(dispatch-sync [:menu/full-screen])} "Full screen"]]]
+     [:a {:on-click #(dispatch-sync [:view/toggle-fullscreen])} "Full screen"]]]
    [:section
     [:a "Board"]
     [:div

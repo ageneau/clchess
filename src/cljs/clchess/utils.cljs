@@ -25,16 +25,16 @@
   ([& body]
    `(fn [~'event] ~@body nil)))  ; always return nil
 
-(defn full-screen-change
+(defn fullscreen-change
   ([on-change]
    (events/listen js/document
                   goog.dom.fullscreen.EventType.CHANGE
                   #(on-change (goog.dom.fullscreen/isFullScreen)))))
 
-(defn request-full-screen [elt]
+(defn request-fullscreen [elt]
   (goog.dom.fullscreen/requestFullScreen elt))
 
-(defn exit-full-screen []
+(defn exit-fullscreen []
   (goog.dom.fullscreen/exitFullScreen))
 
 (defn get-viewport-size []

@@ -2,7 +2,7 @@
   (:require
    [clchess.events-common]
    [clojure.string :as string]
-   [re-frame.core :refer [dispatch reg-event-db path trim-v after debug]]
+   [re-frame.core :refer [dispatch reg-event-db reg-fx reg-event-fx path trim-v after debug]]
    [node-webkit.core :as nw]
    [clchess.utils :as utils]
    [clchess.ctrl :as ctrl]
@@ -25,18 +25,30 @@
      databases)))
 
 
-(reg-event-db
- :menu/full-screen
+(reg-fx
+ :request-fullscreen
+ (fn  [_]
+   (.enterFullscreen (nw/window))))
+
+(reg-fx
+ :exit-fullscreen
+ (fn [_]
+   (.leaveFullscreen (nw/window))))
+
+(reg-event-fx
+ :view/toggle-fullscreen
  [(path :view)
   trim-v]
- (fn [{is-full-screen :is-full-screen :as old} _]
-   (log/debug "Toggle full screen: " is-full-screen)
-   (let [window (nw/window)
-         new-state (not is-full-screen)]
+ (fn [cofx _]
+   (let [is-fullscreen (:is-fullscreen (:db cofx))
+         window (nw/window)
+         new-state (not is-fullscreen)]
+     (log/debug "Toggle full screen: " is-fullscreen)
      (if new-state
-       (.enterFullscreen window)
-       (.leaveFullscreen window))
-     (assoc old :is-full-screen new-state))))
+       {:db (assoc (:db cofx) :is-fullscreen new-state)
+        :request-fullscreen []}
+       {:db (assoc (:db cofx) :is-fullscreen new-state)
+        :exit-fullscreen []}))))
 
 (reg-event-db
  :menu/quit

@@ -119,9 +119,9 @@
                                           :chess/moves
                                           :chess/current-ply]))
 
-(spec/def ::is-full-screen boolean?)
+(spec/def ::is-fullscreen boolean?)
 
-(spec/def ::view (spec/keys :req-un [::is-full-screen]))
+(spec/def ::view (spec/keys :req-un [::is-fullscreen]))
 
 (spec/def :chessdb/current :chessdb/database)
 (spec/def :chessdb/all (spec/map-of string? :chessdb/database))
@@ -160,7 +160,7 @@
            :data-set-3d "Basic"
            :background-img "http://lichess1.org/assets/images/background/landscape.jpg"
            :zoom "80%"}
-   :view {:is-full-screen false}
+   :view {:is-fullscreen false}
    :board {:viewOnly false
            :turnColor "white"
            :lastMove nil

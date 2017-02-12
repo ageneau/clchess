@@ -1,27 +1,43 @@
 (ns clchess.events
   (:require
-   [re-frame.core :refer [dispatch reg-event-db path trim-v after debug]]
+   [re-frame.core :refer [dispatch reg-fx reg-event-db reg-event-fx path trim-v after debug]]
    [clchess.events-common]
    [clchess.utils :as utils]
    [taoensso.timbre :as log]))
 
-(reg-event-db
- :menu/full-screen
+(reg-fx
+ :request-fullscreen
+ (fn  [_]
+   (utils/request-fullscreen (utils/by-id "app"))))
+
+(reg-fx
+ :exit-fullscreen
+ (fn [_]
+   (utils/exit-fullscreen)))
+
+(reg-fx
+ :fullscreen-change
+ (fn [_]
+   (utils/fullscreen-change #(dispatch [:view/fullscreen-changed %]))))
+
+(reg-event-fx
+ :view/toggle-fullscreen
  [(path :view)
   trim-v]
- (fn [{is-full-screen :is-full-screen :as old} _]
-   (log/debug "Toggle full screen: " is-full-screen ", " (utils/get-viewport-size))
-   (let [new-state (not is-full-screen)]
+ (fn [cofx _]
+   (let [is-fullscreen (:is-fullscreen (:db cofx))
+         new-state (not is-fullscreen)]
+     (log/debug "Toggle full screen: " is-fullscreen ", " (utils/get-viewport-size))
      (if new-state
-       (utils/request-full-screen (utils/by-id "app"))
-       (utils/exit-full-screen))
-     (utils/full-screen-change #(dispatch [:view/full-screen-changed %]))
-     old)))
+       {:request-fullscreen
+        :fullscreen-change}
+       {:exit-fullscreen
+        :fullscreen-change}))))
 
 (reg-event-db
- :view/full-screen-changed
+ :view/fullscreen-changed
  [(path :view)
   trim-v]
- (fn [{is-full-screen :is-full-screen :as old} [new-value]]
-   (log/debug "Full screen changed: " is-full-screen ", " new-value)
-   (assoc old :is-full-screen new-value)))
+ (fn [{is-fullscreen :is-fullscreen :as old} [new-value]]
+   (log/debug "Full screen changed: " is-fullscreen ", " new-value)
+   (assoc old :is-fullscreen new-value)))
