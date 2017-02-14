@@ -25,7 +25,7 @@
                        (core/reset-page)))
   (devtools/install!))
 
-(set! core/pre-render-hook (conj core/page-load-hook #(enable-re-frisk!)))
+(set! core/pre-render-hook (conj core/pre-render-hook #(enable-re-frisk!)))
 (set! core/page-load-hook (conj core/page-load-hook setup-dev-environment))
 
 (core/init!)
