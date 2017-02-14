@@ -4,3 +4,6 @@
 
 (deftest example-passing-test
   (is (= 1 1)))
+
+#_(deftest example-not-passing-test
+  (is (= 1 30)))

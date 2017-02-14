@@ -1,8 +1,10 @@
 (defproject clchess "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :license {:name "MIT License"
+            :url "https://opensource.org/licenses/MIT"
+            :year 2017
+            :key "mit"}
 
   :min-lein-version "2.6.1"
 
@@ -26,7 +28,8 @@
             [lein-figwheel "0.5.9"]
             [lein-garden "0.3.0"]
             [lein-node-webkit-build "0.1.8" :exclusions [com.fasterxml.jackson.core/jackson-annotations]]
-            [lein-doo "0.1.7"]]
+            [lein-doo "0.1.7"]
+            [lein-license "0.1.6"]]
 
   :doo {:build "test"}
 
