@@ -59,8 +59,6 @@
 
   :resource-paths ["resources/public"]
 
-  :source-paths ["src/cljs" "src/web" "src/node"]
-
   :cljsbuild {:builds
               [{:id "dev"
                 :source-paths ["src/cljs" "src/node" "env/dev/cljs"]
