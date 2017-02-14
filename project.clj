@@ -18,11 +18,14 @@
                  [secretary "1.2.3"]
                  [prone "1.1.4"]
                  [com.taoensso/timbre "4.8.0"]
-                 [figwheel-sidecar "0.5.9"]
                  [com.cemerick/piggieback "0.2.1"]
                  [garden "1.3.2"]
                  [jamesmacaulay/cljs-promises "0.1.0"]
-                 [binaryage/devtools "0.9.1"]]
+
+                 ;; dev dependencies
+                 [figwheel-sidecar "0.5.9"]
+                 [binaryage/devtools "0.9.1"]
+                 [re-frisk "0.3.2"]]
 
   :plugins [[lein-cljsbuild "1.1.5" :exclusions [org.apache.commons/commons-compress]]
             [lein-figwheel "0.5.9"]

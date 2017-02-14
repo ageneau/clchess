@@ -38,23 +38,23 @@
                      #(dispatch [:view/resized]))
   (utils/fullscreen-change #(dispatch [:view/fullscreen-changed %])))
 
+(def pre-render-hook nil)
+
 (defn reset-page []
-  (log/merge-config! {:ns-whitelist ["clchess.core"
-                                     #_"clchess.board"
-                                     "clchess.events"
-                                     "clchess.subs"
-                                     #_"clchess.views"
-                                     "clchess.events-common"
-                                     "scid.*"
-                                     "clchess.node_subs"
-                                     #_"clchess.ctrl"]})
-  (log/set-level! :debug)
   (dispatch-sync [:initialise-db])
   (dispatch-sync [:game/update-board])
   (let [theme (subscribe [:theme])]
     (theme/init-theme @theme))
+  (doseq [func pre-render-hook]
+    (func))
   (mount-root)
   (listen-to-events))
 
+(def page-load-hook nil)
+
 (defn init! []
+  (log/debug "Executing page load hooks")
+  (doseq [func page-load-hook]
+    (func))
+
   (reset-page))
