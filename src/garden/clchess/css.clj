@@ -10,6 +10,9 @@
 (defstyles clchess
   [(s/input (type= "file")) {:display "none"}]
 
+  [:div:-webkit-full-screen {:width "100% !important"
+                             :height "100% !important"}]
+  
   [:.chessground {:background "#404040"
                   :padding "20px"
                   :border-radius "2px"
