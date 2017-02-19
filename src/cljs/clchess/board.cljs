@@ -4,7 +4,8 @@
               [reagent.core :as reagent :refer [atom]]
               [clchess.widgets :as widgets]
               [clojure.string :as string]
-              [re-frame.core :refer [subscribe dispatch dispatch-sync]]))
+              [re-frame.core :refer [subscribe dispatch dispatch-sync]]
+              [cljsjs.chessground]))
 
 (defn opposite [player]
   (case player

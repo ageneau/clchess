@@ -1,7 +1,8 @@
 (ns clchess.ctrl
   (:require [clchess.utils :as utils]
             [taoensso.timbre :as log]
-            [re-frame.core :refer [subscribe dispatch dispatch-sync]]))
+            [re-frame.core :refer [subscribe dispatch dispatch-sync]]
+            [cljsjs.chess.js]))
 
 (defprotocol ChessGame
   (clear [this])
