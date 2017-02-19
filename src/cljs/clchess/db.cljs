@@ -47,7 +47,7 @@
 
 (spec/def :board/square-kw (into #{} (map keyword ctrl/squares)))
 
-(spec/def :board/piece #{"q" "k" "b" "r"})
+(spec/def :board/piece #{"q" "k" "b" "r" "n" "p"})
 
 (spec/def :board/turn #{"white" "black"})
 (spec/def :board/dests (spec/map-of :board/square (spec/coll-of :board/square)))
