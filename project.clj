@@ -18,25 +18,20 @@
                  [secretary "1.2.3"]
                  [prone "1.1.4"]
                  [com.taoensso/timbre "4.8.0"]
-                 [com.cemerick/piggieback "0.2.1"]
                  [garden "1.3.2"]
                  [jamesmacaulay/cljs-promises "0.1.0"]
                  [cljsjs/chessground "4.4.0-0"]
                  [cljsjs/chess.js "0.10.2-0"]
 
                  ;; dev dependencies
-                 [figwheel-sidecar "0.5.9"]
-                 [binaryage/devtools "0.9.1"]
                  [re-frisk "0.3.2"]]
 
   :plugins [[lein-cljsbuild "1.1.5" :exclusions [org.apache.commons/commons-compress]]
-            [lein-figwheel "0.5.9"]
             [lein-garden "0.3.0"]
             [lein-node-webkit-build "0.1.8" :exclusions [com.fasterxml.jackson.core/jackson-annotations]]
-            [lein-doo "0.1.7"]
             [lein-license "0.1.6"]]
 
-  :doo {:build "test"}
+  ;; :doo {:build "test"}
 
   :node-webkit-build {
                       :root "resources/public" ; your node-webkit app root directory
@@ -66,6 +61,16 @@
 
   :resource-paths ["resources/public"]
 
+  :profiles {:dev
+             {:dependencies [[binaryage/devtools "0.9.1"]
+                             [figwheel-sidecar "0.5.9"]
+                             [com.cemerick/piggieback "0.2.1"]]
+
+              :source-paths ["src/node"]
+              :plugins      [[lein-figwheel "0.5.9"]
+                             [lein-doo "0.1.7"]]
+              }}
+
   :cljsbuild {:builds
               [{:id "dev"
                 :source-paths ["src/cljs" "src/node" "env/dev/cljs"]
@@ -75,11 +80,15 @@
                            :asset-path   "js/compiled/out"
                            :optimizations :none
                            :pretty-print  true
-                           :source-map true}}
+                           :source-map true
+                           :source-map-timestamp true
+                           :preloads [devtools.preload]
+                           :external-config {:devtools/config {:features-to-install :all}}}}
                {:id "test"
                 :source-paths ["src/cljs" "test/cljs"]
                 :compiler
-                {:output-to "resources/public/js/compiled/out/testable.js"
+                {:output-dir "resources/public/js/compiled/out-test"
+                 :output-to "resources/public/js/compiled/out/testable.js"
                  :main clchess.test-runner
                  :optimizations :none}}
                {:id "web"
@@ -90,14 +99,14 @@
                            :asset-path   "js/compiled/out-web"
                            :optimizations :none
                            :pretty-print  true
-                           :source-map true}
-                }
+                           :source-map true}}
                {:id "prod"
                 :source-paths ["src/cljs" "src/node" "env/prod/cljs"]
                 :compiler {:main "clchess.prod"
                            :output-to "resources/public/js/compiled/clchess.js"
                            :output-dir "resources/public/js/compiled/out-prod"
                            :optimizations :advanced
+                           :closure-defines {goog.DEBUG false}
                            :pretty-print false}}]}
 
   :garden {:builds
