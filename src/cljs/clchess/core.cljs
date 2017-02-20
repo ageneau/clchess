@@ -9,7 +9,6 @@
             [clchess.events] ;; Do not remove this. This is needed for handler registration
             [clchess.subs] ;; Do not remove this. This is needed for subscription handler registration
             [clchess.views]
-            [clchess.theme :as theme]
             [taoensso.timbre :as log])
   (:import [goog History]
            [goog.history EventType]))
@@ -43,8 +42,7 @@
 (defn reset-page []
   (dispatch-sync [:initialise-db])
   (dispatch-sync [:game/update-board])
-  (let [theme (subscribe [:theme])]
-    (theme/init-theme @theme))
+  (dispatch-sync [:theme/initialize @(subscribe [:theme])])
   (doseq [func pre-render-hook]
     (func))
   (mount-root)

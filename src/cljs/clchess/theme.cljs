@@ -18,6 +18,9 @@
    {:name "transp"
     :icon "l"}])
 
+(defn find-theme [name]
+  (first (filter #(= name (:name %)) themes)))
+
 (def ^:const theme-names
   (into #{} (map #(:name %) themes)))
 
@@ -32,17 +35,6 @@
 
 (def data-sets-3d
   #{"Basic" "Wood" "Metal" "RedVBlue" "ModernJade" "ModernWood" "Glass" "Trimmed" "Experimental"})
-
-(defonce theme-state
-  (reagent/atom
-   {:is-2d true
-    :theme (first themes)
-    :data-theme (first data-themes)
-    :data-theme-3d (first data-themes-3d)
-    :data-set (first data-sets)
-    :data-set-3d (first data-sets-3d)
-    :background-img "http://lichess1.org/assets/images/background/landscape.jpg"
-    :zoom "80%"}))
 
 (defn theme-2d-list [themes]
   [:div {:class "board"}
@@ -68,7 +60,7 @@
         (classlist/removeAll (utils/body) (clj->js data-sets-3d))
         (classlist/add (utils/body) new-set)))))
 
-(defn init-theme [theme]
+(defn init-theme! [theme]
   (log/debug "init-theme:" theme)
   (switch-theme! (:name theme))
   (if (:is-2d theme)
@@ -85,10 +77,9 @@
      (for [theme data-themes]
        ^{ :key theme }
        [:div {:class "theme" :data-theme theme
-              :on-click #(do
-                           (log/debug "Select:" theme)
-                           (swap! theme-state assoc (if is-2d :data-theme :data-theme-3d) theme)
-                           (switch-data-theme! theme))}
+              :on-click #(dispatch [:theme/switch-theme
+                                    (if is-2d :data-theme-2d :data-theme-3d)
+                                    theme])}
         [:div {:class (string/join " " ["color_demo" theme])}]])]))
 
 (defn piece-selector [{:keys [is-2d]}]
@@ -98,32 +89,31 @@
        ^{ :key set }
        [:div {:class "no-square"
               :data-set set
-              :on-click #(do
-                           (log/debug "Select set:" set)
-                           (swap! theme-state assoc (if is-2d :data-set :data-set-3d) set)
-                           (switch-data-set! set {:is-2d is-2d}))}
+              :on-click #(dispatch [:theme/switch-theme
+                                    (if is-2d :data-set-2d :data-set-3d)
+                                    set])}
         [:piece {:class set}]])]))
 
 (defn background-input []
   [:input {:data-href "/pref/bgImg"
            :type "text"
            :class "background_image"
-           :value (@theme-state :background-img)
-           :on-change #(do
-                         (js/info "Background:" %)
-                         (swap! theme-state assoc :background-img %))}])
+           :value (:background-img @(subscribe [:theme]))
+           :on-change #(dispatch [:theme/switch-theme
+                                  :background-img
+                                  %])}])
 
 (defn theme-selector-dropdown [theme]
   (fn [theme]
-    (log/debug "theme-selector-dropdown")
+    (log/debug "theme-selector-dropdown: " (:theme theme))
     [:div {:class "dropdown"
            :data-themes (string/join " " data-themes)
            :data-theme3ds (string/join " " data-themes-3d)
            :data-sets (string/join " " data-sets)
            :data-set3ds (string/join " " data-sets-3d)}
      [widgets/simple-toggle themes {:container-class "background"
-                                    :on-toggle #(switch-theme! (:name %))
-                                    :initial-value (:theme @theme-state)}]
+                                    :on-toggle #(dispatch [:theme/switch-theme :theme (:name %)])
+                                    :initial-value (find-theme (:theme theme))}]
      (let [options [{:name "d2" :text "2D"}
                     {:name "d3" :text "3D"}]
            current (if (:is-2d theme) (first options) (second options))]
@@ -132,9 +122,7 @@
         {:container-class "dimensions"
          :on-toggle #(let [new-val (= "d2" (:name %))]
                        (log/debug "Switch dim:" new-val)
-                       (dispatch-sync [:set-is-2d  new-val])
-                       (let [theme (assoc theme :is-2d new-val)]
-                         (init-theme theme)))
+                       (dispatch-sync [:set-is-2d  new-val]))
          :initial-value current}])
    
      [background-input]

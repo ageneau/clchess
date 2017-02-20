@@ -12,6 +12,8 @@
                                      #_"clchess.board"
                                      "clchess.events"
                                      "clchess.subs"
+                                     "clchess.theme"
+                                     "clchess.db"
                                      #_"clchess.views"
                                      "clchess.events-common"
                                      "scid.*"

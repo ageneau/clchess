@@ -2,7 +2,7 @@
   (:require
    [clojure.string :as string]
    [clchess.db    :refer [default-value themes->local-store]]
-   [re-frame.core :refer [dispatch dispatch-sync reg-event-db reg-event-fx inject-cofx path trim-v after debug]]
+   [re-frame.core :refer [dispatch dispatch-sync reg-event-db reg-event-fx reg-fx inject-cofx path trim-v after debug]]
    [cljs.spec :as s]
    [clchess.theme :as theme]
    [clchess.utils :as utils]
@@ -38,7 +38,7 @@
 
 ;; -- Event Handlers ----------------------------------------------------------
                                   ;; usage:  (dispatch [:initialise-db])
-(reg-event-fx                 ;; On app startup, ceate initial state
+(reg-event-fx                     ;; On app startup, create initial state
   :initialise-db                  ;; event id being handled
   [(inject-cofx :local-store-themes)
    check-spec-interceptor
@@ -236,3 +236,36 @@
    (let [size {:width (.-innerWidth js/window)
                :height (.-innerHeight js/window)}]
      (assoc db :size size))))
+
+(reg-fx
+ :theme/switch-theme
+ (fn [[type theme]]
+   (log/debug "theme type: " type ", theme:" theme)
+   (case type
+     :theme (theme/switch-theme! theme)
+     :background-img nil
+     :data-theme-2d (theme/switch-data-theme! theme)
+     :data-theme-3d (theme/switch-data-theme! theme)
+     :data-set-2d (theme/switch-data-set! theme {:is-2d true})
+     :data-set-3d (theme/switch-data-set! theme {:is2d false}))))
+
+(reg-fx
+ :theme/initialize
+ (fn [[theme]]
+   (theme/init-theme! theme)))
+
+(reg-event-fx
+ :theme/switch-theme
+ theme-interceptors
+ (fn [cofx [type theme]]
+   (log/debug ":theme/switch-theme: type:" type ", theme" theme ", (:db cofx)" (assoc (:db cofx) type theme))
+   {:db (assoc (:db cofx) type theme)
+    :theme/switch-theme [type theme]}))
+
+(reg-event-fx
+ :theme/initialize
+ [(path :theme)
+  trim-v]
+ (fn [cofx [theme]]
+   (log/debug ":theme/initialize: " theme ", (:db cofx)" (:db cofx))
+   {:theme/initialize [theme]}))
