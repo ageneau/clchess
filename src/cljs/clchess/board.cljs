@@ -5,6 +5,7 @@
               [clchess.widgets :as widgets]
               [clojure.string :as string]
               [re-frame.core :refer [subscribe dispatch dispatch-sync]]
+              [clchess.specs.board :as sboard]
               [cljsjs.chessground]))
 
 (defn opposite [player]
@@ -75,6 +76,11 @@
                promotion-pieces
                squares))))
 
+(defn- is-promoting [dest piece turn]
+  (let [dest-row (row dest)]
+    (and (= (:role piece) "pawn")
+         (or (and (= dest-row "8") (= turn "white"))
+             (and (= dest-row "1") (= turn "black"))))))
 
 (defn on-board-move [chessground]
   (fn [origin dest metadata]
@@ -85,10 +91,7 @@
           turn (js->clj (-> chessground
                             .-data
                             .-turnColor))
-          dest-row (row dest)
-          promoting (and (= (:role piece) "pawn")
-                         (or (and (= dest-row "8") (= turn "black"))
-                             (and (= dest-row "1") (= turn "white"))))
+          promoting (is-promoting dest piece turn)
           player (opposite turn)]
       (log/debug "Origin:" origin ","
                  dest ","
@@ -99,7 +102,7 @@
       (dispatch [:game/board-move
                  origin
                  dest
-                 { :promoting promoting :player player}]))))
+                 { :promoting promoting :player turn}]))))
 
 ;; https://github.com/Day8/re-frame/wiki/Using-Stateful-JS-Components
 (defn board-inner []

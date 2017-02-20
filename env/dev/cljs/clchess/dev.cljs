@@ -8,17 +8,19 @@
 (defn setup-dev-environment
   []
   (log/debug "Setup dev enviroment")
-  (log/merge-config! {:ns-whitelist ["clchess.core"
+  (log/merge-config! {:ns-whitelist [#_"clchess.core"
                                      #_"clchess.board"
                                      "clchess.events"
                                      "clchess.subs"
-                                     "clchess.theme"
+                                     #_"clchess.theme"
                                      "clchess.db"
                                      #_"clchess.views"
+                                     "clchess.widgets"
                                      "clchess.events-common"
-                                     "scid.*"
+                                     "clchess.board"
+                                     #_"scid.*"
                                      "clchess.node_subs"
-                                     #_"clchess.ctrl"]})
+                                     "clchess.ctrl"]})
   (log/set-level! :debug)
   (figwheel/watch-and-reload
    :websocket-url "ws://localhost:3449/figwheel-ws"

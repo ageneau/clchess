@@ -6,6 +6,8 @@
             [goog.events :as events]
             [clojure.string :as string]
             [clchess.utils :as utils :refer [percent-string]]
+            [clchess.specs.chess :as schess]
+            [clchess.specs.board :as sboard]
             [taoensso.timbre :as log]))
 
 (defn hamburger []
@@ -45,8 +47,8 @@
    " King's Pawn"])
 
 (defn ^:private group-moves-by-color [moves]
-  (let [start-color (:color (first moves))
-        last-color (:color (last moves))
+  (let [start-color (::schess/color (first moves))
+        last-color (::schess/color (last moves))
         partitionable `[~@(when-not (= start-color "w") '(:empty-move))
                         ~@moves
                         ~@(when-not (= last-color "b") '(:empty-move))]]
@@ -62,8 +64,8 @@
                     key (str "replay_" i)]
                 ^{ :key key }
                 `[:turn [:index ~(str (+ i 1))]
-                  ~@(when-not (= wmove :empty-move) (list [:move (:san wmove)]))
-                  ~@(when-not (= bmove :empty-move) (list [:move (:san bmove)]))]))))))
+                  ~@(when-not (= wmove :empty-move) (list [::schess/move (::schess/san wmove)]))
+                  ~@(when-not (= bmove :empty-move) (list [::schess/move (::schess/san bmove)]))]))))))
 
 (defn spinner []
   [:div {:class "spinner"}

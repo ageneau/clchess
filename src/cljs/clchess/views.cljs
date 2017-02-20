@@ -5,6 +5,7 @@
             [clchess.board :as board]
             [clchess.theme :as theme]
             [clchess.widgets :as widgets]
+            [clchess.specs.theme :as stheme]
             [taoensso.timbre :as log]))
 
 (defn open-file []
@@ -97,8 +98,8 @@
      [:a {:on-click #(dispatch [:menu/reset-board])} "Reset board"]]]])
 
 (defn top-section [theme]
-  (log/debug "top section:" (:is-2d theme))
-  [:div {:class (if (:is-2d theme) "is2d" "is3d") :id "top"}
+  (log/debug "top section:" (::stheme/is-2d theme))
+  [:div {:class (if (::stheme/is-2d theme) "is2d" "is3d") :id "top"}
    [top-menu]
    [widgets/hamburger]
    [theme/theme-selector theme]
@@ -109,7 +110,7 @@
         moves (subscribe [:game/moves])]
     [:div {:id "page-container"}
      [top-section @theme]
-     [:div {:class (if (:is-2d @theme) "is2d" "is3d") :id "content"}
+     [:div {:class (if (::stheme/is-2d @theme) "is2d" "is3d") :id "content"}
       [:div {:class "lichess_game"}
        [board/board-outer]
        [:div {:class "lichess_ground"}

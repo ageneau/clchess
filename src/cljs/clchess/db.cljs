@@ -1,154 +1,15 @@
 (ns clchess.db
   (:require [cljs.reader]
-            [clchess.theme :as theme]
-            [clchess.ctrl :as ctrl]
-            [cljs.spec :as spec]
+            [cljs.spec :as s]
+            [clchess.specs.clchess :as app-spec]
+            [clchess.specs.chess :as schess]
+            [clchess.specs.theme :as stheme]
+            [clchess.specs.chessdb :as schessdb]
+            [clchess.specs.view :as sview]
+            [clchess.specs.board :as sboard]
             [re-frame.core :as re-frame]
             [cognitect.transit :as t]
             [taoensso.timbre :as log]))
-
-
-;; -- Spec --------------------------------------------------------------------
-;;
-;; This is a clojure.spec specification for the value in app-db. It is like a
-;; Schema. See: http://clojure.org/guides/spec
-;;
-;; The value in app-db should always match this spec. Only event handlers
-;; can change the value in app-db so, after each event handler
-;; has run, we re-check app-db for correctness (compliance with the Schema).
-;;
-;; How is this done? Look in events.cljs and you'll notice that all handers
-;; have an "after" interceptor which does the spec re-check.
-;;
-;; None of this is strictly necessary. It could be omitted. But we find it
-;; good practice.
-
-(spec/def :theme/is-2d boolean?)
-(spec/def :theme/theme theme/theme-names)
-(spec/def :theme/data-theme theme/data-themes)
-(spec/def :theme/data-theme-3d theme/data-themes-3d)
-(spec/def :theme/data-set theme/data-sets)
-(spec/def :theme/data-set-3d theme/data-sets-3d)
-(spec/def :theme/background-img (spec/nilable string?))
-(spec/def :theme/zoom string?)
-
-
-(spec/def ::theme (spec/keys :req-un [:theme/is-2d
-                                      :theme/theme
-                                      :theme/data-theme
-                                      :theme/data-theme-3d
-                                      :theme/data-set
-                                      :theme/data-set-3d
-                                      :theme/background-img
-                                      :theme/zoom]
-                             ))
-
-(spec/def :board/square ctrl/squares)
-(spec/def :board/move (spec/coll-of :board/square :kind vector? :count 2 :distinct true))
-
-(spec/def :board/square-kw (into #{} (map keyword ctrl/squares)))
-
-(spec/def :board/piece #{"q" "k" "b" "r" "n" "p"})
-
-(spec/def :board/turn #{"white" "black"})
-(spec/def :board/dests (spec/map-of :board/square (spec/coll-of :board/square)))
-(spec/def :chess/fen string?)
-
-(spec/def :chessground/viewOnly boolean?)
-(spec/def :chessground/turnColor :board/turn)
-(spec/def :chessground/lastMove (spec/nilable :board/move))
-(spec/def :chessground/color #{"white" "black" "both"})
-(spec/def :chessground/fen :chess/fen)
-(spec/def :chessground/free boolean?)
-(spec/def :chessground/dests :board/dests)
-
-(spec/def :chessground/movable (spec/keys :req-un [:chessground/free
-                                                   :chessground/color
-                                                   :chessground/premove
-                                                   :chessground/dests]))
-(spec/def :chessground/show boolean?)
-(spec/def :chessground/from :board/square)
-(spec/def :chessground/to :board/square)
-(spec/def :chessground/player :board/turn)
-
-
-(spec/def :chessground/promotion (spec/keys :req-un [:chessground/show]
-                                            :opt-un [:chessground/from
-                                                     :chessground/to
-                                                     :chessground/player]))
-
-(spec/def :chessground/board (spec/keys :req-un [:chessground/viewOnly
-                                                 :chessground/turnColor
-                                                 :chessground/lastMove
-                                                 :chessground/fen
-                                                 :chessground/promotion
-                                                 :chessground/movable]))
-
-(spec/def :chess/san string?)
-(spec/def :chess/color #{"w" "b"})
-(spec/def :chess/from :board/square)
-(spec/def :chess/to :board/square)
-(spec/def :chess/flags string?)
-(spec/def :chess/piece :board/piece)
-(spec/def :chess/promotion :board/piece)
-
-(spec/def :chess/move (spec/keys :req-un [:chess/color
-                                          :chess/from
-                                          :chess/to
-                                          :chess/flags
-                                          :chess/piece
-                                          :chess/san
-                                          :chess/fen]
-                                 :opt-un [:chess/promotion]))
-
-(spec/def :chessdb/key string?)
-(spec/def :chessdb/name string?)
-(spec/def :chessdb/type #{:scid})
-(spec/def :chessdb/opened boolean)
-
-(spec/def :chessdb/database (spec/keys :req-un [:chessdb/key
-                                                :chessdb/name
-                                                :chessdb/type
-                                                :chessdb/opened]))
-
-(spec/def :chess/initial-fen :chess/fen)
-(spec/def :chess/ply integer?)
-(spec/def :chess/current-ply :chess/ply)
-(spec/def :chess/moves (spec/coll-of :chess/move :kind vector?))
-
-(spec/def :chess/game (spec/keys :req-un [:chess/initial-fen
-                                          :chess/moves
-                                          :chess/current-ply]))
-
-(spec/def ::is-fullscreen boolean?)
-(spec/def ::width pos-int?)
-(spec/def ::height pos-int?)
-(spec/def :window/size (spec/keys :req [::width
-                                        ::height]))
-
-(spec/def ::view (spec/keys :req-un [::is-fullscreen
-                                     (spec/nilable :window/size)]))
-
-(spec/def :chessdb/current :chessdb/database)
-(spec/def :chessdb/all (spec/map-of string? :chessdb/database))
-
-(spec/def :chessdb/databases (spec/keys :req-opt [:chessdb/current
-                                                  :chessdb/all]))
-
-(spec/def :file-selector/opened boolean?)
-(spec/def :file-selector/action #{:load-pgn :open-db})
-(spec/def :file-selector/accept string?)
-
-(spec/def ::file-selector (spec/keys :req-un [:file-selector/opened]
-                                     :opt-un [:file-selector/action
-                                              :file-selector/accept]))
-
-(spec/def ::db (spec/keys :req-un [::theme
-                                   ::view
-                                   :board/board
-                                   :chess/game
-                                   :chessdb/databases
-                                   ::file-selector]))
 
 ;; -- Default app-db Value  ---------------------------------------------------
 ;;
@@ -158,29 +19,29 @@
 ;;
 
 (def default-value            ;; what gets put into app-db by default.
-  {:theme {:is-2d true
-           :theme "light"
-           :data-theme "blue"
-           :data-theme-3d "Black-White-Aluminium"
-           :data-set "cburnett"
-           :data-set-3d "Basic"
-           :background-img "http://lichess1.org/assets/images/background/landscape.jpg"
-           :zoom "80%"}
-   :view {:is-fullscreen false}
-   :board {:viewOnly false
-           :turnColor "white"
-           :lastMove nil
-           :fen "start"
-           :movable {:free false
-                     :color "both"
-                     :premove true
-                     :dests {}}
-           :promotion {:show false}}
-   :game {:initial-fen "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-          :moves []
-          :current-ply 0}
-   :databases {}
-   :file-selector {:opened false}
+  {::stheme/theme {::stheme/is-2d true
+                   ::stheme/name "light"
+                   ::stheme/data-theme "blue"
+                   ::stheme/data-theme-3d "Black-White-Aluminium"
+                   ::stheme/data-set "cburnett"
+                   ::stheme/data-set-3d "Basic"
+                   ::stheme/background-img "http://lichess1.org/assets/images/background/landscape.jpg"
+                   ::stheme/zoom "80%"}
+   ::sview/view {::sview/is-fullscreen false}
+   ::sboard/board {:viewOnly false
+                   :turnColor "white"
+                   :lastMove nil
+                   :fen "start"
+                   :movable {:free false
+                             :color "both"
+                             :premove true
+                             :dests {}}
+                   :promotion {:show false}}
+   ::schess/game {::schess/initial-fen "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                  ::schess/moves []
+                  ::schess/current-ply 0}
+   ::schessdb/databases {}
+   ::app-spec/file-selector {:file-selector/opened false}
    })
 
 

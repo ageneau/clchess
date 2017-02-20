@@ -42,6 +42,7 @@
 (defn reset-page []
   (dispatch-sync [:initialise-db])
   (dispatch-sync [:game/update-board])
+  (log/debug "Theme: " @(subscribe [:theme]))
   (dispatch-sync [:theme/initialize @(subscribe [:theme])])
   (doseq [func pre-render-hook]
     (func))

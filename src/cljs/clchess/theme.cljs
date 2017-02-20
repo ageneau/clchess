@@ -8,6 +8,8 @@
             [clojure.string :as string]
             [clchess.utils :as utils]
             [clchess.widgets :as widgets]
+            [cljs.spec :as s]
+            [clchess.specs.theme :as stheme]
             [taoensso.timbre :as log]))
 
 (def ^:const themes
@@ -19,6 +21,7 @@
     :icon "l"}])
 
 (defn find-theme [name]
+  {:pre [(s/valid? ::stheme/name name)]}
   (first (filter #(= name (:name %)) themes)))
 
 (def ^:const theme-names
@@ -42,15 +45,20 @@
      ^{ :key theme } [:div {:class "theme" :data-theme theme} [:div {:class "color_demo blue"}]])])
 
 (defn switch-theme! [new-theme]
+  {:pre [(s/valid? ::stheme/name new-theme)]}
   (classlist/removeAll (utils/body) (clj->js theme-names))
   (classlist/add (utils/body) new-theme))
 
 (defn switch-data-theme! [new-theme]
+  {:pre [(s/valid? (s/or :data-theme ::stheme/data-theme
+                         :data-theme-3d ::stheme/data-theme-3d) new-theme)]}
   (classlist/removeAll (utils/body) (clj->js data-themes))
   (classlist/removeAll (utils/body) (clj->js data-themes-3d))
   (classlist/add (utils/body) new-theme))
 
 (defn switch-data-set! [new-set {:keys [is-2d]}]
+  {:pre [(s/valid? (s/or :data-set ::stheme/data-set
+                         :data-set-3d ::stheme/data-set-3d) new-set)]}
   (let [css (dom/getElement "piece-sprite")]
     (if is-2d
       (do
@@ -61,15 +69,17 @@
         (classlist/add (utils/body) new-set)))))
 
 (defn init-theme! [theme]
-  (log/debug "init-theme:" theme)
-  (switch-theme! (:name theme))
-  (if (:is-2d theme)
+  {:pre [(s/valid? ::stheme/theme theme)]}
+  (switch-theme! (::stheme/name theme))
+  (if (::stheme/is-2d theme)
     (do
-      (switch-data-theme! (:data-theme theme))
-      (switch-data-set! (:data-set theme) {:is-2d true}))
+      (log/debug "init-theme 2d:" theme)
+      (switch-data-theme! (::stheme/data-theme theme))
+      (switch-data-set! (::stheme/data-set theme) {:is-2d true}))
     (do
-      (switch-data-theme! (:data-theme-3d theme))
-      (switch-data-set! (:data-set-3d theme) {:is-2d false}))))
+        (log/debug "init-theme 3d:" theme)
+      (switch-data-theme! (::stheme/data-theme-3d theme))
+      (switch-data-set! (::stheme/data-set-3d theme) {:is-2d false}))))
 
 (defn board-selector [{:keys [is-2d]}]
   (let [data-themes (if is-2d data-themes data-themes-3d)]
@@ -98,25 +108,28 @@
   [:input {:data-href "/pref/bgImg"
            :type "text"
            :class "background_image"
-           :value (:background-img @(subscribe [:theme]))
+           :value (::stheme/background-img @(subscribe [:theme]))
            :on-change #(dispatch [:theme/switch-theme
                                   :background-img
                                   %])}])
 
 (defn theme-selector-dropdown [theme]
+  {:pre [(s/valid? ::stheme/theme theme)]}
   (fn [theme]
-    (log/debug "theme-selector-dropdown: " (:theme theme))
+    (log/debug "theme-selector-dropdown: " (::stheme/name theme))
     [:div {:class "dropdown"
            :data-themes (string/join " " data-themes)
            :data-theme3ds (string/join " " data-themes-3d)
            :data-sets (string/join " " data-sets)
            :data-set3ds (string/join " " data-sets-3d)}
      [widgets/simple-toggle themes {:container-class "background"
-                                    :on-toggle #(dispatch [:theme/switch-theme :theme (:name %)])
-                                    :initial-value (find-theme (:theme theme))}]
+                                    :on-toggle #(dispatch [:theme/switch-theme
+                                                           :theme
+                                                           (:name %)])
+                                    :initial-value (find-theme (::stheme/name theme))}]
      (let [options [{:name "d2" :text "2D"}
                     {:name "d3" :text "3D"}]
-           current (if (:is-2d theme) (first options) (second options))]
+           current (if (::stheme/is-2d theme) (first options) (second options))]
        [widgets/simple-toggle
         options
         {:container-class "dimensions"
@@ -127,12 +140,13 @@
    
      [background-input]
      ;; (widgets/slider (:zoom theme-state))
-     (let [div-class (if (:is-2d theme) "is2d" "is3d")]
+     (let [div-class (if (::stheme/is-2d theme) "is2d" "is3d")]
        [:div {:class div-class}
-        [board-selector {:is-2d (:is-2d theme)}]
-        [piece-selector {:is-2d (:is-2d theme)}]])]))
+        [board-selector {:is-2d (::stheme/is-2d theme)}]
+        [piece-selector {:is-2d (::stheme/is-2d theme)}]])]))
 
 (defn theme-selector [theme]
+  {:pre [(s/valid? ::stheme/theme theme)]}
   (let [shown (reagent/atom false)]
     (fn [theme]
       (log/debug "theme-selector")

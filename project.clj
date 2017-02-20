@@ -8,8 +8,9 @@
 
   :min-lein-version "2.6.1"
 
-  :dependencies [[org.clojure/clojure "1.8.0" :scope "provided"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha14" :scope "provided"]
                  [org.clojure/clojurescript "1.9.473" :scope "provided"]
+                 [org.clojure/test.check "0.9.0"]
                  [org.clojure/core.async "0.2.395"]
                  [reagent "0.6.0"]
                  [reagent-forms "0.5.28"]
@@ -82,7 +83,7 @@
                            :optimizations :none
                            :pretty-print  true
                            :source-map true
-                           :source-map-timestamp true
+                           ;; :source-map-timestamp true
                            :preloads [devtools.preload]
                            :external-config {:devtools/config {:features-to-install :all}}}}
                {:id "test"
