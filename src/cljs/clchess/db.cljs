@@ -4,6 +4,7 @@
             [clchess.ctrl :as ctrl]
             [cljs.spec :as spec]
             [re-frame.core :as re-frame]
+            [cognitect.transit :as t]
             [taoensso.timbre :as log]))
 
 
@@ -196,8 +197,10 @@
 (defn themes->local-store
   "Puts theme into localStorage"
   [theme]
-  (log/debug "themes->local-store")
-  (.setItem js/localStorage ls-key (str theme)))   ;; sorted-map writen as an EDN map
+
+  (let [w (t/writer :json)]
+    (log/debug "themes->local-store")
+    (.setItem js/localStorage ls-key (t/write w theme))))   ;; sorted-map writen as an EDN map
 
 ;; register a coeffect handler which will load a value from localstore
 ;; To see it used look in events.clj at the event handler for `:initialise-db`
@@ -205,8 +208,9 @@
  :local-store-themes
  (fn [cofx _]
    "Read in themes from localstore, and process into a map we can merge into app-db."
-   (assoc cofx :local-store-themes
-          (into (sorted-map)
-                (some->> (.getItem js/localStorage ls-key)
-                         (cljs.reader/read-string)       ;; stored as an EDN map.
-                         )))))
+   (let [r (t/reader :json)]
+     (assoc cofx :local-store-themes
+            (into (sorted-map)
+                  (some->> (.getItem js/localStorage ls-key)
+                           (t/read r)
+                           ))))))

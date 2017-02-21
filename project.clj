@@ -20,6 +20,7 @@
                  [com.taoensso/timbre "4.8.0"]
                  [garden "1.3.2"]
                  [jamesmacaulay/cljs-promises "0.1.0"]
+                 [com.cognitect/transit-cljs "0.8.239"]
                  [cljsjs/chessground "4.4.0-0"]
                  [cljsjs/chess.js "0.10.2-0"]
 
