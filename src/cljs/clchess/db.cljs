@@ -96,9 +96,9 @@
                                           :chess/to
                                           :chess/flags
                                           :chess/piece
-                                          :chess/promotion
                                           :chess/san
-                                          :chess/fen]))
+                                          :chess/fen]
+                                 :opt-un [:chess/promotion]))
 
 (spec/def :chessdb/key string?)
 (spec/def :chessdb/name string?)

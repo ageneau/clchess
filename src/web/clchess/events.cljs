@@ -1,7 +1,7 @@
 (ns clchess.events
   (:require
    [re-frame.core :refer [dispatch reg-fx reg-event-db reg-event-fx path trim-v after debug]]
-   [clchess.events-common]
+   [clchess.events-common :refer [view-interceptor generic-interceptor]]
    [clchess.utils :as utils]
    [taoensso.timbre :as log]))
 
@@ -17,8 +17,7 @@
 
 (reg-event-fx
  :view/toggle-fullscreen
- [(path :view)
-  trim-v]
+ view-interceptor
  (fn [cofx _]
    (let [is-fullscreen (:is-fullscreen (:db cofx))
          new-state (not is-fullscreen)]
@@ -29,8 +28,7 @@
 
 (reg-event-db
  :view/fullscreen-changed
- [(path :view)
-  trim-v]
+ view-interceptor
  (fn [{is-fullscreen :is-fullscreen :as db} [new-value]]
    (log/debug "Full screen changed: " is-fullscreen ", " new-value)
    (assoc db :is-fullscreen new-value)))

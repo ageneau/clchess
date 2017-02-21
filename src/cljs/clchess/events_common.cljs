@@ -36,6 +36,35 @@
                          trim-v])        ;; remove event id from event vec
 
 
+(def game-interceptors [check-spec-interceptor
+                        (path :game)
+                        (when ^boolean js/goog.DEBUG debug)
+                        trim-v])
+
+(def board-interceptors [check-spec-interceptor
+                         (path :board)
+                         (when ^boolean js/goog.DEBUG debug)
+                         trim-v])
+
+(def generic-interceptor [check-spec-interceptor
+                          (when ^boolean js/goog.DEBUG debug)
+                          trim-v])
+
+(def file-interceptor [check-spec-interceptor
+                       (path :file-selector)
+                       (when ^boolean js/goog.DEBUG debug)
+                       trim-v])
+
+(def view-interceptor [check-spec-interceptor
+                       (path :view)
+                       (when ^boolean js/goog.DEBUG debug)
+                       trim-v])
+
+(def databases-interceptor [check-spec-interceptor
+                            (path :databases)
+                            (when ^boolean js/goog.DEBUG debug)
+                            trim-v])
+
 ;; -- Event Handlers ----------------------------------------------------------
                                   ;; usage:  (dispatch [:initialise-db])
 (reg-event-fx                     ;; On app startup, create initial state
@@ -62,8 +91,7 @@
 
 (reg-event-fx
  :game/next-move
- [(path :game)
-  trim-v]
+ game-interceptors
  (fn [cofx _]
    (let [{ current-ply :current-ply moves :moves } (:db cofx)]
      (if (= current-ply (count moves))
@@ -77,8 +105,7 @@
 
 (reg-event-fx
  :game/previous-move
- [(path :game)
-  trim-v]
+ game-interceptors
  (fn [cofx _]
    (let [{ current-ply :current-ply moves :moves } (:db cofx)]
      (if (= current-ply 0)
@@ -92,8 +119,7 @@
 
 (reg-event-fx
  :game/first-move
- [(path :game)
-  trim-v]
+ game-interceptors
  (fn [cofx _]
    (log/debug "First move:" (:db cofx))
    {:db (assoc (:db cofx) :current-ply 0)
@@ -101,8 +127,7 @@
 
 (reg-event-fx
  :game/last-move
- [(path :game)
-  trim-v]
+ game-interceptors
  (fn [cofx _]
    (let [{ current-ply :current-ply moves :moves } (:db cofx) ]
      (log/debug "Last move:" (:db cofx))
@@ -111,14 +136,13 @@
 
 (reg-event-db
  :game/set-board
- [(path :board)
-  trim-v]
+ board-interceptors
  (fn [db [board-state]]
    (assoc db :board board-state)))
 
 (reg-event-fx
  :game/board-move
- [trim-v]
+ generic-interceptor
  (fn [cofx [from to { promoting :promoting player :player :as flags } :as move]]
    (let [game (:game (:db cofx))
          board (:board (:db cofx))
@@ -144,7 +168,7 @@
 
 (reg-event-db
  :game/update-board
- [trim-v]
+ generic-interceptor
  (fn [db _]
    (let [{board :board game :game} db
          {fen :fen
@@ -163,7 +187,7 @@
 
 (reg-event-fx
  :menu/open-db
- [trim-v]
+ generic-interceptor
  (fn [cofx _]
    (log/debug "Open DB")
    {:db (-> (:db cofx)
@@ -173,7 +197,7 @@
 
 (reg-event-fx
  :menu/load-pgn
- [trim-v]
+ generic-interceptor
  (fn [cofx _]
    (log/debug "Load pgn")
    {:db (-> (:db cofx)
@@ -183,22 +207,21 @@
 
 (reg-event-db
  :menu/reset-board
- [trim-v]
+ generic-interceptor
  (fn [db _]
    (log/debug "Reset board")
    db))
 
 (reg-event-db
  :file/open-selector
- [(path :file-selector)
-  trim-v]
+ file-interceptor
  (fn [{opened :opened :as db} _]
    (views/open-file)
    (assoc db :opened true)))
 
 (reg-event-fx
  :file/changed
- [trim-v]
+ file-interceptor
  (fn [cofx [action file]]
    (log/debug "File changed: " action ", " file)
    (let [db (assoc-in (:db cofx) [:file-selector :opened] false)]
@@ -215,7 +238,7 @@
 
 (reg-event-fx
  :game/promote-to
- [trim-v]
+ generic-interceptor
  (fn [cofx [piece]]
    (log/debug "Promote to: " piece)
    (let [game (:game (:db cofx))
@@ -230,8 +253,7 @@
 
 (reg-event-db
  :view/resized
- [(path :view)
-  trim-v]
+ view-interceptor
  (fn [db _]
    (let [size {:width (.-innerWidth js/window)
                :height (.-innerHeight js/window)}]
@@ -264,8 +286,7 @@
 
 (reg-event-fx
  :theme/initialize
- [(path :theme)
-  trim-v]
+ theme-interceptors
  (fn [cofx [theme]]
    (log/debug ":theme/initialize: " theme ", (:db cofx)" (:db cofx))
    {:theme/initialize [theme]}))

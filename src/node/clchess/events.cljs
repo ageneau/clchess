@@ -1,6 +1,6 @@
 (ns clchess.events
   (:require
-   [clchess.events-common]
+   [clchess.events-common :refer [view-interceptor databases-interceptor generic-interceptor]]
    [clojure.string :as string]
    [re-frame.core :refer [dispatch reg-event-db reg-fx reg-event-fx path trim-v after debug]]
    [node-webkit.core :as nw]
@@ -11,8 +11,7 @@
 
 (reg-event-db
  :db/open
- [(path :databases)
-  trim-v]
+ databases-interceptor
  (fn [databases [fn]]
    (log/debug "Databases: " databases ", " fn ", " (find fn databases))
    (if-not (find fn databases)
@@ -41,8 +40,7 @@
 
 (reg-event-fx
  :view/toggle-fullscreen
- [(path :view)
-  trim-v]
+ view-interceptor
  (fn [cofx _]
    (log/debug "toggle-fullscreen")
    (let [is-fullscreen (:is-fullscreen (:db cofx))
@@ -57,7 +55,7 @@
 
 (reg-event-fx
  :menu/quit
- [trim-v]
+ generic-interceptor
  (fn [cofx _]
    (log/debug "Quit")
    {:app/exit nil}))
