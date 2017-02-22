@@ -221,7 +221,7 @@
 
 (reg-event-fx
  :file/changed
- file-interceptor
+ generic-interceptor
  (fn [cofx [action file]]
    (log/debug "File changed: " action ", " file)
    (let [db (assoc-in (:db cofx) [:file-selector :opened] false)]
