@@ -10,50 +10,28 @@
             [clchess.widgets :as widgets]
             [cljs.spec :as s]
             [clchess.specs.theme :as stheme]
+            [clchess.data.clchess :as data]
             [taoensso.timbre :as log]))
-
-(def ^:const themes
-  [{:name "light"
-    :icon "5"}
-   {:name "dark"
-    :icon "4"}
-   {:name "transp"
-    :icon "l"}])
 
 (defn find-theme [name]
   {:pre [(s/valid? ::stheme/name name)]}
-  (first (filter #(= name (:name %)) themes)))
-
-(def ^:const theme-names
-  (into #{} (map #(:name %) themes)))
-
-(def data-themes
-  #{"blue" "blue2" "blue3" "canvas" "wood" "wood2" "wood3" "maple" "green" "marble" "brown" "leather" "grey" "metal" "olive" "purple"})
-
-(def data-themes-3d
-  #{"Black-White-Aluminium" "Brushed-Aluminium" "China-Blue" "China-Green" "China-Grey" "China-Scarlet" "Classic-Blue" "Gold-Silver" "Light-Wood" "Power-Coated" "Rosewood" "Marble" "Wax" "Jade" "Woodi"})
-
-(def data-sets
-  #{"cburnett" "merida" "alpha" "pirouetti" "chessnut" "chess7" "reillycraig" "companion" "fantasy" "spatial" "shapes"})
-
-(def data-sets-3d
-  #{"Basic" "Wood" "Metal" "RedVBlue" "ModernJade" "ModernWood" "Glass" "Trimmed" "Experimental"})
+  (first (filter #(= name (:name %)) data/themes)))
 
 (defn theme-2d-list [themes]
   [:div {:class "board"}
-   (for [theme themes]
+   (for [theme data/themes]
      ^{ :key theme } [:div {:class "theme" :data-theme theme} [:div {:class "color_demo blue"}]])])
 
 (defn switch-theme! [new-theme]
   {:pre [(s/valid? ::stheme/name new-theme)]}
-  (classlist/removeAll (utils/body) (clj->js theme-names))
+  (classlist/removeAll (utils/body) (clj->js data/theme-names))
   (classlist/add (utils/body) new-theme))
 
 (defn switch-data-theme! [new-theme]
   {:pre [(s/valid? (s/or :data-theme ::stheme/data-theme
                          :data-theme-3d ::stheme/data-theme-3d) new-theme)]}
-  (classlist/removeAll (utils/body) (clj->js data-themes))
-  (classlist/removeAll (utils/body) (clj->js data-themes-3d))
+  (classlist/removeAll (utils/body) (clj->js data/data-themes))
+  (classlist/removeAll (utils/body) (clj->js data/data-themes-3d))
   (classlist/add (utils/body) new-theme))
 
 (defn switch-data-set! [new-set {:keys [is-2d]}]
@@ -65,7 +43,7 @@
         (dom/setProperties css #js {:href (str "lila/public/stylesheets/piece/" new-set ".css")})
         (dataset/set (utils/body) "pieceSet" new-set))
       (do
-        (classlist/removeAll (utils/body) (clj->js data-sets-3d))
+        (classlist/removeAll (utils/body) (clj->js data/data-sets-3d))
         (classlist/add (utils/body) new-set)))))
 
 (defn init-theme! [theme]
@@ -77,12 +55,12 @@
       (switch-data-theme! (::stheme/data-theme theme))
       (switch-data-set! (::stheme/data-set theme) {:is-2d true}))
     (do
-        (log/debug "init-theme 3d:" theme)
+      (log/debug "init-theme 3d:" theme)
       (switch-data-theme! (::stheme/data-theme-3d theme))
       (switch-data-set! (::stheme/data-set-3d theme) {:is-2d false}))))
 
 (defn board-selector [{:keys [is-2d]}]
-  (let [data-themes (if is-2d data-themes data-themes-3d)]
+  (let [data-themes (if is-2d data/data-themes data/data-themes-3d)]
     [:div {:class "board"}
      (for [theme data-themes]
        ^{ :key theme }
@@ -93,7 +71,7 @@
         [:div {:class (string/join " " ["color_demo" theme])}]])]))
 
 (defn piece-selector [{:keys [is-2d]}]
-  (let [data-sets (if is-2d data-sets data-sets-3d)]
+  (let [data-sets (if is-2d data/data-sets data/data-sets-3d)]
     [:div {:class "piece_set"}
      (for [set data-sets]
        ^{ :key set }
@@ -118,15 +96,15 @@
   (fn [theme]
     (log/debug "theme-selector-dropdown: " (::stheme/name theme))
     [:div {:class "dropdown"
-           :data-themes (string/join " " data-themes)
-           :data-theme3ds (string/join " " data-themes-3d)
-           :data-sets (string/join " " data-sets)
-           :data-set3ds (string/join " " data-sets-3d)}
-     [widgets/simple-toggle themes {:container-class "background"
-                                    :on-toggle #(dispatch [:theme/switch-theme
-                                                           :theme
-                                                           (:name %)])
-                                    :initial-value (find-theme (::stheme/name theme))}]
+           :data-themes (string/join " " data/data-themes)
+           :data-theme3ds (string/join " " data/data-themes-3d)
+           :data-sets (string/join " " data/data-sets)
+           :data-set3ds (string/join " " data/data-sets-3d)}
+     [widgets/simple-toggle data/themes {:container-class "background"
+                                         :on-toggle #(dispatch [:theme/switch-theme
+                                                                :theme
+                                                                (:name %)])
+                                         :initial-value (find-theme (::stheme/name theme))}]
      (let [options [{:name "d2" :text "2D"}
                     {:name "d3" :text "3D"}]
            current (if (::stheme/is-2d theme) (first options) (second options))]
@@ -137,7 +115,7 @@
                        (log/debug "Switch dim:" new-val)
                        (dispatch-sync [:set-is-2d  new-val]))
          :initial-value current}])
-   
+     
      [background-input]
      ;; (widgets/slider (:zoom theme-state))
      (let [div-class (if (::stheme/is-2d theme) "is2d" "is3d")]
