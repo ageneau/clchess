@@ -111,12 +111,13 @@
     [:div {:id "page-container"}
      [top-section @theme]
      [:div {:class (if (::stheme/is-2d @theme) "is2d" "is3d") :id "content"}
-      [:div {:class "lichess_game"}
+      [:div.lichess_game
        [board/board-outer]
-       [:div {:class "lichess_ground"}
+       [:div.lichess_ground
         [widgets/ceval-box]
-        [widgets/opening-box]
-        [widgets/replay @moves]
+        [:div.areplay
+         [widgets/opening-box]
+         [widgets/replay @moves]]
         [widgets/explorer-box]
         [widgets/game-controls]]]]
      [file-input]

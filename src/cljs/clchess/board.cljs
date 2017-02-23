@@ -33,7 +33,7 @@
 
 (defn square-pos [square]
   (let [[row-pos file-pos] (to-pos square)]
-    {:bottom (utils/percent-string (* row-pos 12.5))
+    {:top (utils/percent-string (* (- 7 row-pos) 12.5))
      :left (utils/percent-string (* file-pos 12.5)) }))
 
 (defn piece-to-db-format [piece]

@@ -35,16 +35,26 @@
 ;;                         (swap! app-state assoc param (.-target.value e)))}])
 
 (defn ceval-box []
-  [:div {:class "ceval_box"}
-   [:div {:class "switch"}
-    [:input {:id "analyse-toggle-ceval" :class "cmn-toggle cmn-toggle-round" :type "checkbox"}]
+  [:div.ceval_box
+   [:pearl [:span.cpu "CPU"]]
+   [:help
+    "Stockfish 8"
+    [:span.native "native"]
+    [:br]
+    "in local browser"]
+   [:div.switch
+    {:title "Toggle local evaluation (l)"}
+    [:input#analyse-toggle-ceval.cmn-toggle.cmn-toggle-round
+     {:type "checkbox"}]
     [:label {:for "analyse-toggle-ceval"}]]
-   [:help "Local computer evaluation" [:br] "for variation analysis"]])
+   [:a.show-threat {:data-icon "7", :title "Show threat (x)"}]])
 
 (defn opening-box []
-  [:div {:class "opening_box" :title "B00 King's Pawn"}
-   [:strong "B00"]
-   " King's Pawn"])
+  [:div.opening_box
+   {:title
+    "D31 Queen's Gambit Declined: Queen's Knight Variation"}
+   [:strong "D31"]
+   " Queen's Gambit Declined: Queen's Knight Variation"])
 
 (defn ^:private group-moves-by-color [moves]
   (let [start-color (::schess/color (first moves))
@@ -212,20 +222,23 @@
                 [:label {:for class } text]]))]]]))))
 
 (defn game-controls []
-  [:div {:class "game_control"}
-   [:div {:class "buttons"}
-    [:div
-     [:div {:class "jumps"}
-      [:button {:class "button" :data-icon "Y" :on-click #(dispatch [:game/previous-move])}]
-      [:button {:class "first" :data-icon "W" :on-click #(dispatch [:game/first-move])}]]
-     [:div {:class "jumps"}
-      [:button {:class "button" :data-icon "X" :on-click #(dispatch [:game/next-move])}]
-      [:button {:class "first" :data-icon "V" :on-click #(dispatch [:game/last-move])}]]]
-    [:div
-     [:button {:id "open_explorer" :data-hint "openingExplorer" :class "button hint--bottom active"}
-      [:i {:data-icon "]"}]]
-     [:button {:data-hint "Menu" :class "button hint--bottom"}
-      [:i {:data-icon "["}]]]]])
+  [:div.game_control
+   [:div.features
+    [:button.hint--bottom
+     {:data-hint "Opening explorer & tablebase",
+      :data-act "explorer"}
+     [:i {:data-icon "]"}]]
+    [:button.hint--bottom
+     {:data-hint "Practice with computer", :data-act "practice"}
+     [:i {:data-icon ""}]]]
+   [:div.jumps
+    [:button {:data-act "first", :data-icon "W" :on-click #(dispatch [:game/first-move])}]
+    [:button {:data-act "prev", :data-icon "Y" :on-click #(dispatch [:game/previous-move])}]
+    [:button {:data-act "next", :data-icon "X", :on-click #(dispatch [:game/next-move])}]
+    [:button {:data-act "last", :data-icon "V", :on-click #(dispatch [:game/last-move])}]]
+   [:button.hint--bottom
+    {:data-hint "Menu", :data-act "menu"}
+    [:i {:data-icon "["}]]])
 
 (defn simple-toggle [options {:keys [on-toggle container-class initial-value]}]
   (let [state (reagent/atom initial-value)]
