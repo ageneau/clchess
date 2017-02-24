@@ -58,9 +58,8 @@
 (defn themes->local-store
   "Puts theme into localStorage"
   [theme]
-
   (let [w (t/writer :json)]
-    (log/debug "themes->local-store")
+    (log/debug "themes->local-store: " theme)
     (.setItem js/localStorage ls-key (t/write w theme))))   ;; sorted-map writen as an EDN map
 
 ;; register a coeffect handler which will load a value from localstore

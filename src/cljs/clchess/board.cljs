@@ -123,8 +123,6 @@
                         new-state (-> board-state
                                       (merge options)
                                       (assoc-in [:movable :events :after] movable))]
-                    (log/debug "Board state:" board-state)
-                    (log/debug "NEW state:" new-state)
                     (.set chessground (clj->js new-state))))]
 
     (reagent/create-class

@@ -77,7 +77,11 @@
   [(inject-cofx :local-store-themes)
    check-spec-interceptor]                                   ;; afterwards: check that app-db matches the spec
   (fn [{:keys [db local-store-themes]} _]                    ;; the handler being registered
-    {:db (merge-with merge default-value  {:theme local-store-themes}) }))  ;; all hail the new state
+    (let [theme (merge (::stheme/theme default-value)
+                       local-store-themes)
+          db-new (assoc default-value ::stheme/theme theme)]
+      {:db db-new
+       :theme/initialize [theme]})))  ;; all hail the new state
 
                                   ;; usage:  (dispatch [:set-is-2d  true])
 (reg-event-db                 ;; this handler changes the 2d/3d view flag
@@ -267,20 +271,20 @@
 (reg-fx
  :theme/switch-theme
  (fn [[type theme]]
-   {:pre [(s/valid? #{:theme
-                      :background-img
-                      :data-theme-2d
-                      :data-theme-3d
-                      :data-set-2d
-                      :data-set-3d} type)]}
+   {:pre [(s/valid? #{::stheme/name
+                      ::stheme/background-img
+                      ::stheme/data-theme
+                      ::stheme/data-theme-3d
+                      ::stheme/data-set
+                      ::stheme/data-set-3d} type)]}
    (log/debug "theme type: " type ", theme:" theme)
    (case type
-     :theme (theme/switch-theme! theme)
-     :background-img nil
-     :data-theme-2d (theme/switch-data-theme! theme)
-     :data-theme-3d (theme/switch-data-theme! theme)
-     :data-set-2d (theme/switch-data-set! theme {:is-2d true})
-     :data-set-3d (theme/switch-data-set! theme {:is2d false}))))
+     ::stheme/name (theme/switch-theme! theme)
+     ::stheme/background-img nil
+     ::stheme/data-theme (theme/switch-data-theme! theme)
+     ::stheme/data-theme-3d (theme/switch-data-theme! theme)
+     ::stheme/data-set (theme/switch-data-set! theme {:is-2d true})
+     ::stheme/data-set-3d (theme/switch-data-set! theme {:is2d false}))))
 
 (reg-fx
  :theme/initialize

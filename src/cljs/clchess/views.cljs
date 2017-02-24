@@ -19,7 +19,9 @@
         action (:action selector)
         value (reagent/atom "")]
     (log/debug "file-input: " selector)
-    [:input {:field :file
+    [:input {
+             ;; FIXME: Unknown prop `field` on <input> tag
+             ;; :field :file
              :type :file
              :accept accept
              :id "file-selector"

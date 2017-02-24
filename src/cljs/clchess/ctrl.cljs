@@ -65,11 +65,11 @@
 (defn compute-state [{:keys [::schess/initial-fen
                              ::schess/moves
                              ::schess/current-ply] :as state}]
-  (let [fen (if (or (empty? moves)
+  (let [last-move (when (> current-ply 0) (nth moves (- current-ply 1)))
+        fen (if (or (empty? moves)
                     (= current-ply 0))
               initial-fen
-              (::schess/fen (nth moves (- current-ply 1))))
-        last-move (when (> current-ply 0) (nth moves (- current-ply 1)))
+              (::schess/fen last-move))
         chess (create-chess fen)]
     {::schess/fen fen
      ::schess/color (color chess)

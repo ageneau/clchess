@@ -12,15 +12,15 @@
                                      #_"clchess.board"
                                      "clchess.events"
                                      "clchess.subs"
-                                     #_"clchess.theme"
+                                     "clchess.theme"
                                      "clchess.db"
                                      #_"clchess.views"
-                                     "clchess.widgets"
+                                     #_"clchess.widgets"
                                      "clchess.events-common"
-                                     "clchess.board"
+                                     #_"clchess.board"
                                      #_"scid.*"
                                      "clchess.node_subs"
-                                     "clchess.ctrl"]})
+                                     #_"clchess.ctrl"]})
   (log/set-level! :debug)
   (figwheel/watch-and-reload
    :websocket-url "ws://localhost:3449/figwheel-ws"

@@ -40,9 +40,6 @@
 (def pre-render-hook nil)
 
 (defn reset-page []
-  (dispatch-sync [:initialise-db])
-  (dispatch-sync [:game/update-board])
-  (log/debug "Theme: " @(subscribe [:theme]))
   (dispatch-sync [:theme/initialize @(subscribe [:theme])])
   (doseq [func pre-render-hook]
     (func))
@@ -52,6 +49,7 @@
 (def page-load-hook nil)
 
 (defn init! []
+  (dispatch-sync [:initialise-db])
   (log/debug "Executing page load hooks")
   (doseq [func page-load-hook]
     (func))

@@ -66,7 +66,7 @@
        ^{ :key theme }
        [:div {:class "theme" :data-theme theme
               :on-click #(dispatch [:theme/switch-theme
-                                    (if is-2d :data-theme-2d :data-theme-3d)
+                                    (if is-2d ::stheme/data-theme ::stheme/data-theme-3d)
                                     theme])}
         [:div {:class (string/join " " ["color_demo" theme])}]])]))
 
@@ -78,7 +78,7 @@
        [:div {:class "no-square"
               :data-set set
               :on-click #(dispatch [:theme/switch-theme
-                                    (if is-2d :data-set-2d :data-set-3d)
+                                    (if is-2d ::stheme/data-set ::stheme/data-set-3d)
                                     set])}
         [:piece {:class set}]])]))
 
@@ -88,7 +88,7 @@
            :class "background_image"
            :value (::stheme/background-img @(subscribe [:theme]))
            :on-change #(dispatch [:theme/switch-theme
-                                  :background-img
+                                  ::stheme/background-img
                                   %])}])
 
 (defn theme-selector-dropdown [theme]
@@ -102,7 +102,7 @@
            :data-set3ds (string/join " " data/data-sets-3d)}
      [widgets/simple-toggle data/themes {:container-class "background"
                                          :on-toggle #(dispatch [:theme/switch-theme
-                                                                :theme
+                                                                ::stheme/name
                                                                 (:name %)])
                                          :initial-value (find-theme (::stheme/name theme))}]
      (let [options [{:name "d2" :text "2D"}
