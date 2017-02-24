@@ -36,7 +36,6 @@
                             :promotion ::schess/promotion}))
 
 (defn- move [chess move]
-  (log/debug "Move0:" move)
   (chess-js->clj (js->clj (.move chess (clj->js move)) :keywordize-keys true)))
 
 (s/fdef move
@@ -77,8 +76,6 @@
               (::schess/fen (nth moves (- current-ply 1))))
         last-move (when (> current-ply 0) (nth moves (- current-ply 1)))
         chess (create-chess fen)]
-    (log/debug "Current ply: " current-ply)
-    (log/debug "Last move: " last-move)
     {::schess/fen fen
      ::schess/color (color chess)
      ::schess/last-move last-move
@@ -108,7 +105,6 @@
                            ~@(when promotion (list :promotion promotion))])
         move (move chess move-args)
         move-info (assoc move ::schess/fen (.fen chess))]
-    (log/debug "Move:" move ", opts:" options ", promotion:" promotion)
     (-> state
         (update ::schess/moves #(conj % move-info))
         (update ::schess/current-ply inc))))
@@ -127,7 +123,6 @@
   (let [chess (create-chess initial-fen)]
     (vec (for [move moves]
            (let [replayed-move (chess-js->clj (js->clj (.move chess (clj->js move)) :keywordize-keys true))]
-             (log/debug "replayed: " replayed-move)
              (assoc replayed-move ::schess/fen (.fen chess)))))))
 
 (s/fdef compute-fens
@@ -147,7 +142,6 @@
     (let [moves (map #'chess-js->clj
                      (js->clj (.history chess #js {:verbose true}) :keywordize-keys true))
           moves-and-fen (compute-fens initial-fen moves)]
-      (log/debug "load-pgn: " pgn ", " moves-and-fen)
       {::schess/moves moves-and-fen
        ::schess/current-ply 0
        ::schess/initial-fen initial-fen})))
