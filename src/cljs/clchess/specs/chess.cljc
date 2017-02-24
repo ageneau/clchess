@@ -1,5 +1,7 @@
 (ns clchess.specs.chess
-  (:require [cljs.spec :as s]
+  (:require #?(:clj [clojure.spec :as s]
+               :cljs [cljs.spec :as s])
+            #?(:cljs [cljsjs.chess.js])
             [clchess.specs.board :as sboard]))
 
 (s/def ::fen string?)

@@ -1,16 +1,12 @@
 (ns clchess.specs.board
-  (:require [cljs.spec :as s]
-            [cljsjs.chess.js]))
+  (:require #?(:clj [clojure.spec :as s]
+               :cljs [cljs.spec :as s])
+            [clchess.data.board :as dboard]))
 
-
-(def ^:const squares
-  (into #{} (let [chess (js/Chess.)]
-              (js->clj (.-SQUARES chess)))))
-
-(s/def ::square squares)
+(s/def ::square dboard/squares)
 (s/def ::move (s/coll-of ::square :kind vector? :count 2 :distinct true))
 
-(s/def ::square-kw (into #{} (map keyword squares)))
+(s/def ::square-kw (into #{} (map keyword dboard/squares)))
 
 (s/def ::piece #{"q" "k" "b" "r" "n" "p"})
 

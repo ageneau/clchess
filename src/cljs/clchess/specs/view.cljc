@@ -1,5 +1,6 @@
 (ns clchess.specs.view
-  (:require [cljs.spec :as s]))
+  (:require #?(:clj [clojure.spec :as s]
+               :cljs [cljs.spec :as s])))
 
 (s/def ::is-fullscreen boolean?)
 (s/def ::width int?)

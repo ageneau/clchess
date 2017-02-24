@@ -1,6 +1,7 @@
 (ns clchess.specs.theme
-  (:require [cljs.spec :as s]
-            [clchess.data.clchess :as data]))
+  (:require #?(:clj [clojure.spec :as s]
+               :cljs [cljs.spec :as s])
+            [clchess.data.themes :as data]))
 
 (s/def ::is-2d boolean?)
 (s/def ::name data/theme-names)

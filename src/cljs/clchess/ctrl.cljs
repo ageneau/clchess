@@ -1,12 +1,11 @@
 (ns clchess.ctrl
   (:require [clchess.utils :as utils]
             [taoensso.timbre :as log]
-            [re-frame.core :refer [subscribe dispatch dispatch-sync]]
             [cljs.spec :as s]
             [cljs.spec.test :as stest :include-macros true]
-            [clojure.test.check :as tc]
             [clchess.specs.chess :as schess]
             [clchess.specs.board :as sboard]
+            [clchess.data.board :as dboard]
             [cljsjs.chess.js]))
 
 (defn- create-chess
@@ -15,10 +14,6 @@
   ([fen]
    {:pre [(s/valid? ::schess/fen fen)]}
    (js/Chess. fen)))
-
-(def ^:const squares
-  (into #{} (let [chess (create-chess)]
-              (js->clj (.-SQUARES chess)))))
 
 (defn- color [chess]
   {:post [(s/valid? ::schess/color %)]}
@@ -65,7 +60,7 @@
 
 (defn- dest-squares [chess]
   {:post [(s/valid? ::sboard/dests %)]}
-  (reduce merge (map #(moves chess %1) squares)))
+  (reduce merge (map #(moves chess %1) dboard/squares)))
 
 (defn compute-state [{:keys [::schess/initial-fen
                              ::schess/moves
@@ -90,13 +85,10 @@
 
 (stest/instrument `compute-state)
 
-(def tmp1)
-
 (defn make-move [{:keys [::schess/initial-fen
                          ::schess/moves
                          ::schess/current-ply] :as state} from to & {:keys [::schess/promotion] :as options}]
   {:post [(s/valid? ::schess/game %)]}
-  (set! tmp1 state)
   (let [{fen ::schess/fen} (compute-state state)
         chess (create-chess fen)
         move-args (apply hash-map

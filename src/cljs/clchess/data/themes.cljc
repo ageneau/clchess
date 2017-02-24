@@ -1,4 +1,4 @@
-(ns clchess.data.clchess)
+(ns clchess.data.themes)
 
 (def ^:const themes
   [{:name "light"

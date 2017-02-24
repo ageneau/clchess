@@ -10,7 +10,7 @@
             [clchess.widgets :as widgets]
             [cljs.spec :as s]
             [clchess.specs.theme :as stheme]
-            [clchess.data.clchess :as data]
+            [clchess.data.themes :as data]
             [taoensso.timbre :as log]))
 
 (defn find-theme [name]

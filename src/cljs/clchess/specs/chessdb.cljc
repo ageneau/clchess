@@ -1,5 +1,6 @@
 (ns clchess.specs.chessdb
-  (:require [cljs.spec :as s]))
+  (:require #?(:clj [clojure.spec :as s]
+               :cljs [cljs.spec :as s])))
 
 (s/def ::key string?)
 (s/def ::name string?)

@@ -1,5 +1,6 @@
 (ns clchess.specs.clchess
-  (:require [cljs.spec :as s]
+  (:require #?(:clj [clojure.spec :as s]
+               :cljs [cljs.spec :as s])
             [clchess.specs.view :as sview]
             [clchess.specs.chess :as schess]
             [clchess.specs.chessdb :as schessdb]
