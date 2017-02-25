@@ -13,6 +13,7 @@
   "dependencies": {
     "node-notifier": "^4.2.1",
     "nw-notify": "0.2.0",
+    "scid": "0.0.1",
     "uci": "^0.3.3"
   },
   "scripts": {

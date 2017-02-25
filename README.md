@@ -21,7 +21,8 @@ To get an interactive development environment run:
 And in another shell:
 
     cd resources/public/
-    npm install
+    npm install -g nw-gyp
+    ./build.sh
     nw .
 
 To clean all compiled files:
