@@ -31,7 +31,11 @@
                             :promotion ::schess/promotion}))
 
 (defn- move [chess move]
-  (chess-js->clj (js->clj (.move chess (clj->js move)) :keywordize-keys true)))
+  (as-> move m
+    (clj->js m)
+    (.move chess m)
+    (js->clj m :keywordize-keys true)
+    (chess-js->clj m)))
 
 (s/fdef move
         :args (s/cat :chess any?
