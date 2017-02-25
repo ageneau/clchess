@@ -21,6 +21,7 @@ To get an interactive development environment run:
 And in another shell:
 
     cd resources/public/
+    npm install
     nw .
 
 To clean all compiled files:

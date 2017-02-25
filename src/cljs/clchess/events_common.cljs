@@ -10,6 +10,7 @@
    [clchess.specs.view :as sview]
    [clchess.specs.chessdb :as schessdb]
    [clchess.theme :as theme]
+   [clchess.board :as board]
    [clchess.utils :as utils]
    [clchess.ctrl :as ctrl]
    [clchess.views :as views]
@@ -84,7 +85,7 @@
        :theme/initialize [theme]})))  ;; all hail the new state
 
                                   ;; usage:  (dispatch [:set-is-2d  true])
-(reg-event-db                 ;; this handler changes the 2d/3d view flag
+(reg-event-fx                 ;; this handler changes the 2d/3d view flag
   :set-is-2d                      ;; event-id
   theme-interceptors  ;; interceptor  (wraps the handler)
 
@@ -93,9 +94,25 @@
   ;; be the value at a certain path within db, namely :showing.
   ;; Also, the use of the 'trim-v' interceptor means we can omit
   ;; the leading underscore from the 2nd parameter (event vector).
-  (fn [old [new-val]]    ;; handler
-    (log/debug "In set-is-2d:" old)
-    (assoc old ::stheme/is-2d new-val)))         ;; return new state for the path
+  (fn [{:keys [db]} [new-val]]    ;; handler
+    (log/debug "In set-is-2d:" db)
+    (let [theme (assoc db ::stheme/is-2d new-val)]
+      {:db theme
+       :theme/initialize [theme]
+       :dispatch-later [{:ms 100 :dispatch [:board/force-resize]}]
+       })))
+
+(reg-fx
+ :board/force-resize
+ (fn [_]
+   (board/force-resize)))
+
+(reg-event-fx
+ :board/force-resize
+ board-interceptors
+ (fn [cofx _]
+   (log/debug "Forcing board resize")
+   {:board/force-resize nil}))
 
 (reg-event-fx
  :game/next-move

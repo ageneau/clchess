@@ -9,17 +9,17 @@
   []
   (log/debug "Setup dev enviroment")
   (log/merge-config! {:ns-whitelist [#_"clchess.core"
-                                     #_"clchess.board"
+                                     "clchess.board"
                                      "clchess.events"
                                      "clchess.subs"
-                                     "clchess.theme"
+                                     #_"clchess.theme"
                                      "clchess.db"
                                      #_"clchess.views"
                                      #_"clchess.widgets"
                                      "clchess.events-common"
                                      #_"clchess.board"
                                      #_"scid.*"
-                                     "clchess.node_subs"
+                                     #_"clchess.node_subs"
                                      #_"clchess.ctrl"]})
   (log/set-level! :debug)
   (figwheel/watch-and-reload

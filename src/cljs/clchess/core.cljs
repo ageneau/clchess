@@ -41,6 +41,7 @@
 
 (defn reset-page []
   (dispatch-sync [:theme/initialize @(subscribe [:theme])])
+  (dispatch-sync [:game/update-board])
   (doseq [func pre-render-hook]
     (func))
   (mount-root)

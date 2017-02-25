@@ -104,7 +104,7 @@
                  dest
                  { :promoting promoting :player turn}]))))
 
-;; https://github.com/Day8/re-frame/wiki/Using-Stateful-JS-Components
+;; https://github.com/Day8/re-frame/blob/master/docs/Using-Stateful-JS-Components.md
 (defn board-inner []
   (let [board (atom nil)
         options (clj->js {"zoom" 9})
@@ -119,6 +119,7 @@
                                  :highlight {:lastMove true
                                              :check true
                                              :dragOver true}
+                                 :resizable true ;; listens to chessground.resize on document.body to clear bounds cache
                                  }
                         new-state (-> board-state
                                       (merge options)
@@ -150,3 +151,7 @@
   (let [board (subscribe [:board])]   ;; obtain the data
     (fn []
       [board-inner {:board-state @board}])))
+
+
+(defn force-resize []
+  (.dispatchEvent (utils/body) (js/Event. "chessground.resize")))

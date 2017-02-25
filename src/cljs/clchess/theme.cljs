@@ -37,13 +37,16 @@
 (defn switch-data-set! [new-set {:keys [is-2d]}]
   {:pre [(s/valid? (s/or :data-set ::stheme/data-set
                          :data-set-3d ::stheme/data-set-3d) new-set)]}
-  (let [css (dom/getElement "piece-sprite")]
+  (let [piece-css (dom/getElement "piece-sprite")
+        board-css (dom/getElement "board-css")]
     (if is-2d
       (do
-        (dom/setProperties css #js {:href (str "lila/public/stylesheets/piece/" new-set ".css")})
+        (dom/setProperties piece-css #js {:href (str "lila/public/stylesheets/piece/" new-set ".css")})
+        (dom/setProperties board-css #js {:href "lila/public/stylesheets/board.css" })
         (dataset/set (utils/body) "pieceSet" new-set))
       (do
         (classlist/removeAll (utils/body) (clj->js data/data-sets-3d))
+        (dom/setProperties board-css #js {:href "lila/public/stylesheets/board-3d.css" })
         (classlist/add (utils/body) new-set)))))
 
 (defn init-theme! [theme]
