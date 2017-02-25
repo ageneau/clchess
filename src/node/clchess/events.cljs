@@ -7,6 +7,7 @@
    [clchess.utils :as utils]
    [clchess.ctrl :as ctrl]
    [scid.base :as chessdb]
+   [clchess.specs.chessdb :as schessdb]
    [taoensso.timbre :as log]))
 
 (reg-event-db
@@ -16,11 +17,14 @@
    (log/debug "Databases: " databases ", " fn ", " (find fn databases))
    (if-not (find fn databases)
      (let [key (chessdb/open (utils/remove-extension fn))
-           new {:key key :name fn :type :scid :opened true}]
+           new {::schessdb/key key
+                ::schessdb/name fn
+                ::schessdb/type :scid
+                ::schessdb/opened true}]
        (log/debug "key=" key ", " new)
        (-> databases
-           (assoc :current new)
-           (assoc-in [:all key] new)))
+           (assoc ::schessdb/current new)
+           (assoc-in [::schessdb/all key] new)))
      databases)))
 
 (reg-fx

@@ -20,7 +20,7 @@
                                      #_"clchess.board"
                                      #_"scid.*"
                                      #_"clchess.node_subs"
-                                     #_"clchess.ctrl"]})
+                                     "clchess.ctrl"]})
   (log/set-level! :debug)
   (figwheel/watch-and-reload
    :websocket-url "ws://localhost:3449/figwheel-ws"

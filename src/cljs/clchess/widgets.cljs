@@ -136,7 +136,7 @@
    ;; [spinner]
    [:div {:class "data"}
     [move-table]
-    #_[game-list]]])
+    [game-list]]])
 
 (defn context-menu []
   [:div#analyse-cm.visible

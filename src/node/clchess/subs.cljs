@@ -2,6 +2,7 @@
   (:require [re-frame.core :refer [reg-sub]]
             [taoensso.timbre :as log]
             [clchess.subs_common]
+            [clchess.specs.chessdb :as schessdb]
             [scid.game :as game]
             [scid.base :as base]))
 
@@ -9,8 +10,5 @@
 (reg-sub
  :game/list
  (fn [db _]
-   (log/debug "reg-sub :game/list ")
-   (when-let [db (get-in @db [:databases :current])]
-     (log/debug ":game-list:" db)
-     (log/debug ":game-list list:" (game/get-list (:key db)))
-     (game/get-list (:key db)))))
+   (when-let [db (get-in db [::schessdb/databases ::schessdb/current])]
+     (game/get-list (::schessdb/key db)))))
