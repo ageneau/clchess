@@ -13,6 +13,7 @@
 (s/def ::to ::sboard/square)
 (s/def ::flags string?)
 (s/def ::piece ::sboard/piece)
+(s/def ::captured ::piece)
 (s/def ::promotion ::sboard/piece)
 
 (s/def ::move (s/keys :req [::color
@@ -22,6 +23,7 @@
                             ::piece
                             ::san]
                       :opt [::fen
+                            ::captured
                             ::promotion]))
 
 (s/def ::last-move ::move)

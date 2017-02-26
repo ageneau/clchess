@@ -28,7 +28,8 @@
                             :piece ::schess/piece
                             :san ::schess/san
                             :fen ::schess/fen
-                            :promotion ::schess/promotion}))
+                            :promotion ::schess/promotion
+                            :captured ::schess/captured}))
 
 (defn- move [chess move]
   (as-> move m

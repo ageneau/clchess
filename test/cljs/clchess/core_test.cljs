@@ -44,7 +44,7 @@
          "rnbq1rk1/pP2bppp/4pn2/8/3P4/5N2/PP2PPPP/RNBQKB1R w KQ - 1 7"
          ::schess/moves
          [{::schess/from "b7"
-           :captured "r"
+           ::schess/captured "r"
            ::schess/flags "cp"
            ::schess/fen
            "Qnbq1rk1/p3bppp/4pn2/8/3P4/5N2/PP2PPPP/RNBQKB1R b KQ - 0 7"
