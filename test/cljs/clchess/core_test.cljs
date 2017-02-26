@@ -7,7 +7,32 @@
 
 (deftest bishop-diag
   (is (= (ctrl/moves (ctrl/create-chess "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2") "c1")
-         {"c1" '("d2" "e3" "f4" "g5" "h6")})))
+         {"c1" #{"d2" "e3" "f4" "g5" "h6"}})))
+
+(deftest compute-state
+  (is (= (ctrl/compute-state {::schess/initial-fen
+                                "rnbq1rk1/pP2bppp/4pn2/8/3P4/5N2/PP2PPPP/RNBQKB1R w KQ - 1 7"
+                                ::schess/moves
+                                []
+                                ::schess/current-ply 0})
+         {:clchess.specs.chess/fen
+          "rnbq1rk1/pP2bppp/4pn2/8/3P4/5N2/PP2PPPP/RNBQKB1R w KQ - 1 7",
+          :clchess.specs.chess/color "w",
+          :clchess.specs.chess/last-move nil,
+          :clchess.specs.board/dests
+          {"d4" #{"d5"},
+           "e2" #{"e3" "e4"},
+           "f3" #{"e5" "g5" "h4" "g1" "d2"},
+           "b7" #{"a8" "c8"},
+           "d1" #{"c2" "b3" "a4" "d2" "d3"},
+           "g2" #{"g3" "g4"},
+           "h2" #{"h3" "h4"},
+           "e1" #{"d2"},
+           "b2" #{"b3" "b4"},
+           "h1" #{"g1"},
+           "a2" #{"a3" "a4"},
+           "c1" #{"d2" "e3" "f4" "g5" "h6"},
+           "b1" #{"a3" "c3" "d2"}}})))
 
 
 (deftest make-move-1

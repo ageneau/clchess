@@ -22,6 +22,7 @@
                  [garden "1.3.2"]
                  [jamesmacaulay/cljs-promises "0.1.0"]
                  [com.cognitect/transit-cljs "0.8.239"]
+                 [clj-chess "0.4.0"]
                  [cljsjs/chessground "4.4.0-0"]
                  [cljsjs/chess.js "0.10.2-0"]
 
@@ -67,9 +68,11 @@
              {:dependencies [[binaryage/devtools "0.9.1"]
                              [figwheel-sidecar "0.5.9"]
                              [com.cemerick/piggieback "0.2.1"]
-                             [lein-doo "0.1.7"]]
+                             [lein-doo "0.1.7"]
+                             [org.apache.commons/commons-math3 "3.6.1"]
+                             [org.apache.commons/commons-lang3 "3.5"]]
 
-              :source-paths ["src/node"]
+              :source-paths ["src/cljs" "src/node"]
               :plugins      [[lein-figwheel "0.5.9"]
                              [lein-doo "0.1.7"]]
               }}

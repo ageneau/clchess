@@ -16,12 +16,13 @@
 (s/def ::captured ::piece)
 (s/def ::promotion ::sboard/piece)
 
-(s/def ::move (s/keys :req [::color
+(s/def ::move (s/keys :req [;;::color
                             ::from
                             ::to
-                            ::flags
-                            ::piece
-                            ::san]
+                            ;;::flags
+                            ;;::piece
+                            ;;::san
+                            ]
                       :opt [::fen
                             ::captured
                             ::promotion]))

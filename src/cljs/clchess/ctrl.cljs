@@ -1,6 +1,5 @@
 (ns clchess.ctrl
-  (:require [clchess.utils :as utils]
-            [taoensso.timbre :as log]
+  (:require [taoensso.timbre :as log]
             [cljs.spec :as s]
             [cljs.spec.test :as stest :include-macros true]
             [clchess.specs.chess :as schess]
@@ -54,7 +53,7 @@
   (let [dests (map (fn [move]
                      ((js->clj move) "to"))
                    (.moves chess #js {:square square :verbose true}))]
-    (when (not-empty dests) {square dests})))
+    (when (not-empty dests) {square (into #{} dests)})))
 
 (s/fdef moves
         :args (s/cat :chess any?

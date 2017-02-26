@@ -5,7 +5,6 @@
    [re-frame.core :refer [dispatch reg-event-db reg-fx reg-event-fx path trim-v after debug]]
    [node-webkit.core :as nw]
    [clchess.utils :as utils]
-   [clchess.ctrl :as ctrl]
    [scid.base :as chessdb]
    [clchess.specs.chessdb :as schessdb]
    [taoensso.timbre :as log]))
