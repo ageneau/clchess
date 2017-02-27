@@ -66,7 +66,8 @@
   :profiles {:dev
              {:dependencies [[binaryage/devtools "0.9.1"]
                              [figwheel-sidecar "0.5.9"]
-                             [com.cemerick/piggieback "0.2.1"]]
+                             [com.cemerick/piggieback "0.2.1"]
+                             [lein-doo "0.1.7"]]
 
               :source-paths ["src/node"]
               :plugins      [[lein-figwheel "0.5.9"]
