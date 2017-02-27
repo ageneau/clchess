@@ -5,7 +5,7 @@
             [clchess.specs.chess :as schess]
             [clchess.specs.chessdb :as schessdb]
             [clchess.specs.theme :as stheme]
-            [clchess.specs.board :as sboard]))
+            [clchess.specs.chessground :as schessground]))
 
 ;; -- Spec --------------------------------------------------------------------
 ;;
@@ -34,7 +34,7 @@
 
 (s/def ::db (s/keys :req [::stheme/theme
                           ::sview/view
-                          ::sboard/board
+                          ::schessground/board
                           ::schess/game
                           ::schessdb/databases
                           ::file-selector]))

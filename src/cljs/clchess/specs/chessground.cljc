@@ -12,25 +12,25 @@
 (s/def ::free boolean?)
 (s/def ::dests ::sboard/dests)
 
-(s/def ::movable (s/keys :req [::free
-                               ::color
-                               ::premove
-                               ::dests]))
+(s/def ::movable (s/keys :req-un [::free
+                                  ::color
+                                  ::premove
+                                  ::dests]))
 (s/def ::show boolean?)
 (s/def ::from ::sboard/square)
 (s/def ::to ::sboard/square)
 (s/def ::player ::sboard/turn)
 
 
-(s/def ::promotion (s/keys :req [::show]
-                           :opt [::from
-                                 ::to
-                                 ::player]))
+(s/def ::promotion (s/keys :req-un [::show]
+                           :opt-un [::from
+                                    ::to
+                                    ::player]))
 
-(s/def ::board (s/keys :req [::viewOnly
-                             ::turnColor
-                             ::lastMove
-                             ::fen
-                             ::promotion
-                             ::movable]))
+(s/def ::board (s/keys :req-un [::viewOnly
+                                ::turnColor
+                                ::lastMove
+                                ::fen
+                                ::promotion
+                                ::movable]))
 

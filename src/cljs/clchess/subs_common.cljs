@@ -1,6 +1,7 @@
 (ns clchess.subs_common
   (:require [re-frame.core :refer [reg-sub]]
             [clchess.specs.board :as sboard]
+            [clchess.specs.chessground :as schessground]
             [clchess.specs.theme :as stheme]
             [clchess.specs.chess :as schess]
             [taoensso.timbre :as log]))
@@ -17,7 +18,7 @@
  :board
  (fn [db _]
    (log/debug "reg-sub :board")
-   (::sboard/board db)))
+   (::schessground/board db)))
 
 (reg-sub
  :game/moves
@@ -28,8 +29,8 @@
 (reg-sub
  :game/promotion
  (fn [db _]
-   (log/debug "reg-sub :game/promotion: " (get-in db [::sboard/board :promotion]))
-   (get-in db [::sboard/board :promotion])))
+   (log/debug "reg-sub :game/promotion: " (get-in db [::schessground/board :promotion]))
+   (get-in db [::schessground/board :promotion])))
 
 (reg-sub
  :file-selector/changed

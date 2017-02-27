@@ -127,7 +127,7 @@
                      :moves ::schess/moves)
         :ret ::schess/moves)
 
-(stest/instrument `make-move)
+(stest/instrument `compute-fens)
 
 
 (defn load-pgn [{:keys [::schess/initial-fen

@@ -11,6 +11,4 @@
 (s/def ::piece #{"q" "k" "b" "r" "n" "p"})
 
 (s/def ::turn #{"white" "black"})
-(s/def ::dests (s/map-of ::square (s/coll-of ::square)))
-
-(s/def ::board any?)
+(s/def ::dests (s/map-of ::square (s/coll-of ::square :distinct true)))

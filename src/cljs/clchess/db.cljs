@@ -7,6 +7,7 @@
             [clchess.specs.chessdb :as schessdb]
             [clchess.specs.view :as sview]
             [clchess.specs.board :as sboard]
+            [clchess.specs.chessground :as schessground]
             [re-frame.core :as re-frame]
             [cognitect.transit :as t]
             [taoensso.timbre :as log]))
@@ -28,15 +29,15 @@
                    ::stheme/background-img "http://lichess1.org/assets/images/background/landscape.jpg"
                    ::stheme/zoom "80%"}
    ::sview/view {::sview/is-fullscreen false}
-   ::sboard/board {:viewOnly false
-                   :turnColor "white"
-                   :lastMove nil
-                   :fen "start"
-                   :movable {:free false
-                             :color "both"
-                             :premove true
-                             :dests {}}
-                   :promotion {:show false}}
+   ::schessground/board {:viewOnly false
+                         :turnColor "white"
+                         :lastMove nil
+                         :fen "start"
+                         :movable {:free false
+                                   :color "both"
+                                   :premove true
+                                   :dests {}}
+                         :promotion {:show false}}
    ::schess/game {::schess/initial-fen "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
                   ::schess/moves []
                   ::schess/current-ply 0}

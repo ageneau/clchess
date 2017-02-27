@@ -6,6 +6,7 @@
    [cljs.spec :as s]
    [clchess.specs.theme :as stheme]
    [clchess.specs.board :as sboard]
+   [clchess.specs.chessground :as schessground]
    [clchess.specs.chess :as schess]
    [clchess.specs.view :as sview]
    [clchess.specs.chessdb :as schessdb]
@@ -48,7 +49,7 @@
                         trim-v])
 
 (def board-interceptors [check-spec-interceptor
-                         (path ::sboard/board)
+                         (path ::schessground/board)
                          (when ^boolean js/goog.DEBUG debug)
                          trim-v])
 
@@ -163,14 +164,14 @@
  :game/set-board
  board-interceptors
  (fn [db [board-state]]
-   (assoc db ::sboard/board board-state)))
+   (assoc db ::schessground/board board-state)))
 
 (reg-event-fx
  :game/board-move
  generic-interceptor
  (fn [cofx [from to { promoting :promoting player :player :as flags } :as move]]
    (let [game (::schess/game (:db cofx))
-         board (::sboard/board (:db cofx))
+         board (::schessground/board (:db cofx))
          { current-ply ::schess/current-ply moves ::schess/moves } game]
      (log/debug "Board move:" from "," to "," current-ply ", flags:" flags ", promoting: " promoting)
      (cond
@@ -181,8 +182,8 @@
 
        promoting
        (let [promotion {:show true :from from :to to :player player}]
-         (log/debug "Promoting:" (::sboard/board (assoc-in (:db cofx) [::sboard/board :promotion] promotion)))
-         {:db (assoc-in (:db cofx) [::sboard/board :promotion] promotion)})
+         (log/debug "Promoting:" (::schessground/board (assoc-in (:db cofx) [::schessground/board :promotion] promotion)))
+         {:db (assoc-in (:db cofx) [::schessground/board :promotion] promotion)})
 
        :else
        (let [game-state (ctrl/make-move game from to)
@@ -195,20 +196,22 @@
  :game/update-board
  generic-interceptor
  (fn [db _]
-   (let [{board ::sboard/board game ::schess/game} db
+   (let [{board ::schessground/board game ::schess/game} db
          {fen ::schess/fen
           color ::schess/color
           dest-squares ::sboard/dests
           last-move ::schess/last-move
           :as state} (ctrl/compute-state game)
          updated-board (-> db
-                           (assoc-in [::sboard/board :turnColor] color)
-                           (assoc-in [::sboard/board :lastMove] (when last-move
+                           (assoc-in [::schessground/board :turnColor] (case color
+                                                                         "w" "white"
+                                                                         "b" "black"))
+                           (assoc-in [::schessground/board :lastMove] (when last-move
                                                                   [(::schess/from last-move)
                                                                    (::schess/to last-move)]))
-                           (assoc-in [::sboard/board :fen] fen)
-                           (assoc-in [::sboard/board :movable :dests] dest-squares))]
-     (log/debug "Update board:" (::sboard/board updated-board))
+                           (assoc-in [::schessground/board :fen] fen)
+                           (assoc-in [::schessground/board :movable :dests] dest-squares))]
+     (log/debug "Update board:" (::schessground/board updated-board))
      updated-board)))
 
 (reg-event-fx
@@ -268,13 +271,13 @@
  (fn [cofx [piece]]
    (log/debug "Promote to: " piece)
    (let [game (::schess/game (:db cofx))
-         board (::sboard/board (:db cofx))
+         board (::schessground/board (:db cofx))
          {from :from to :to } (:promotion board)
          new-state (ctrl/make-move game from to ::schess/promotion piece)]
      (log/debug "Make move:" new-state ", NEW STATE:" (update-in (:db cofx) [::schess/game] merge new-state))
      {:db (-> (:db cofx)
               (update-in [::schess/game] merge new-state)
-              (assoc-in [::sboard/board :promotion] {:show false}))
+              (assoc-in [::schessground/board :promotion] {:show false}))
       :dispatch [:game/update-board]})))
 
 (reg-event-db
