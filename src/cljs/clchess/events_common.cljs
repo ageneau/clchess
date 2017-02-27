@@ -13,7 +13,7 @@
    [clchess.theme :as theme]
    [clchess.board :as board]
    [clchess.utils :as utils]
-   [clchess.chess :as ctrl]
+   [clchess.ctrl :as ctrl]
    [clchess.views :as views]
    [taoensso.timbre :as log]))
 
