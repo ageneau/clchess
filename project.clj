@@ -91,12 +91,20 @@
                            :preloads [devtools.preload]
                            :external-config {:devtools/config {:features-to-install :all}}}}
                {:id "test"
-                :source-paths ["src/cljs" "test/cljs"]
+                :source-paths ["src/cljs" "test"]
                 :compiler
                 {:output-dir "resources/public/js/compiled/out-test"
                  :output-to "resources/public/js/compiled/out/testable.js"
                  :main clchess.test-runner
                  :optimizations :none}}
+               {:id "node-test"
+                :source-paths ["src/cljs" "test"]
+                :compiler
+                {:output-dir "resources/public/nodejs/compiled/out-test"
+                 :output-to "resources/public/nodejs/compiled/out/testable.js"
+                 :main clchess.test-runner
+                 :optimizations :none
+                 :target :nodejs}}
                {:id "web"
                 :source-paths ["src/cljs" "src/web" "env/dev/cljs"]
                 :compiler {:main "clchess.dev"

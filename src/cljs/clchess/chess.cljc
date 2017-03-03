@@ -53,17 +53,18 @@
    :clj
    (defn dest-squares [clj-chess]
      {:post [(s/valid? ::sboard/dests %)]}
-     (let [moves-grouped (-> clj-chess
-                             game/board
-                             board/board-to-map
-                             (get :moves)
-                             (as-> moves (group-by :from moves)))]
-       (map (fn [[from dests]] (vector (board/square-to-string from)
-                                       (map #(-> %
-                                                 (get :to)
-                                                 board/square-to-string)
-                                            dests)))
-            moves-grouped))))
+     (into {}
+           (let [moves-grouped (-> clj-chess
+                                   game/board
+                                   board/board-to-map
+                                   (get :moves)
+                                   (as-> moves (group-by :from moves)))]
+             (map (fn [[from dests]] (vector (board/square-to-string from)
+                                             (into #{} (map #(-> %
+                                                                 (get :to)
+                                                                 board/square-to-string)
+                                                            dests))))
+                  moves-grouped)))))
 
 (defn compute-state [{:keys [::schess/initial-fen
                              ::schess/moves

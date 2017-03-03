@@ -1,21 +1,46 @@
 (ns clchess.chess-test
-  (:require [clojure.test :refer :all]
-            [clojure.spec :as s]
-            [clojure.spec.test :as stest :include-macros true]
+  (:require #?(:clj [clojure.test :refer (is deftest testing)]
+               :cljs [cljs.test :refer (is deftest testing)])
+            #?(:clj [clojure.spec :as s]
+               :cljs [cljs.spec :as s])
+            #?(:clj [clojure.spec.test :as stest :include-macros true]
+               :cljs [cljs.spec.test :as stest :include-macros true])
             [clchess.chess :as chess]
             [clchess.specs.board :as sboard]
             [clchess.specs.chess :as schess]
             [clj-chess.board :refer [to-fen]]
-            [clj-chess.game :refer :all]
+            [clj-chess.game :as game]
             [clj-chess.pgn :refer [parse-pgn]]))
 
 (deftest en-passant-in-fen
-  (let [g0 (-> (new-game)
-               (add-san-move "d4"))]
-    (is (= (-> g0 board to-fen)
+  (let [g0 (-> (game/new-game)
+               (game/add-san-move "d4"))]
+    (is (= (-> g0 game/board to-fen)
            "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1"))))
 
-(deftest compute-state
+(deftest compute-state-1
+  (is (= (chess/compute-state {::schess/initial-fen
+                               "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                               ::schess/moves
+                               []
+                               ::schess/current-ply 0})
+         {:clchess.specs.chess/fen
+          "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+          :clchess.specs.chess/color "w",
+          :clchess.specs.chess/last-move nil,
+          :clchess.specs.board/dests
+          {"f2" #{"f3" "f4"},
+           "e2" #{"e3" "e4"},
+           "g2" #{"g3" "g4"},
+           "h2" #{"h3" "h4"},
+           "d2" #{"d3" "d4"},
+           "c2" #{"c3" "c4"},
+           "b2" #{"b3" "b4"},
+           "g1" #{"f3" "h3"},
+           "a2" #{"a3" "a4"},
+           "b1" #{"a3" "c3"}}})))
+
+(deftest compute-state-2
   (is (= (chess/compute-state {::schess/initial-fen
                                "rnbq1rk1/pP2bppp/4pn2/8/3P4/5N2/PP2PPPP/RNBQKB1R w KQ - 1 7"
                                ::schess/moves

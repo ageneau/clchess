@@ -31,7 +31,11 @@ To clean all compiled files:
 
 ## Tests
 
-To run the tests
+To run the Clojurescript tests using NodeJS
+
+    lein doo node node-test
+
+To run the Clojurescript tests using http://phantomjs.org/
 
     lein doo phantom test
 
