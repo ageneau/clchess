@@ -37,34 +37,27 @@
     :white "w"
     :black "b"))
 
-#?(:cljs
-   (defn dest-squares [clj-chess]
-     {:post [(s/valid? ::sboard/dests %)]}
-     (into {}
-           (map (fn [[k v]] (vector (board/square-to-string k)
-                                    (into #{} (map #(-> %
-                                                        (get :to)
-                                                        (board/square-to-string))
-                                                   v))))
-                (group-by :from (-> clj-chess
-                                    game/board
-                                    board/moves
-                                    (js->clj :keywordize-keys true))))))
-   :clj
-   (defn dest-squares [clj-chess]
-     {:post [(s/valid? ::sboard/dests %)]}
-     (into {}
-           (let [moves-grouped (-> clj-chess
-                                   game/board
-                                   board/board-to-map
-                                   (get :moves)
-                                   (as-> moves (group-by :from moves)))]
-             (map (fn [[from dests]] (vector (board/square-to-string from)
-                                             (into #{} (map #(-> %
-                                                                 (get :to)
-                                                                 board/square-to-string)
-                                                            dests))))
-                  moves-grouped)))))
+(defn board-moves [board]
+  #?(:clj (-> board
+              board/board-to-map
+              (get :moves))
+     :cljs (-> board
+               board/moves
+               (js->clj :keywordize-keys true))))
+
+(defn dest-squares [clj-chess]
+  {:post [(s/valid? ::sboard/dests %)]}
+  (into {}
+        (let [moves-grouped (-> clj-chess
+                                game/board
+                                board-moves
+                                (as-> moves (group-by :from moves)))]
+          (map (fn [[from dests]] (vector (board/square-to-string from)
+                                          (into #{} (map #(-> %
+                                                              (get :to)
+                                                              board/square-to-string)
+                                                         dests))))
+               moves-grouped))))
 
 (defn compute-state [{:keys [::schess/initial-fen
                              ::schess/moves
