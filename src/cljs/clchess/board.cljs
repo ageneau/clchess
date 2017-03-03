@@ -91,8 +91,8 @@
           turn (js->clj (-> chessground
                             .-data
                             .-turnColor))
-          promoting (is-promoting dest piece turn)
-          player (opposite turn)]
+          player (opposite turn)
+          promoting (is-promoting dest piece player)]
       (log/debug "Origin:" origin ","
                  dest ","
                  (js->clj metadata) ","
@@ -102,7 +102,7 @@
       (dispatch [:game/board-move
                  origin
                  dest
-                 { :promoting promoting :player turn}]))))
+                 { :promoting promoting :player player}]))))
 
 ;; https://github.com/Day8/re-frame/blob/master/docs/Using-Stateful-JS-Components.md
 (defn board-inner []

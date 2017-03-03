@@ -34,7 +34,7 @@
             [lein-node-webkit-build "0.1.8" :exclusions [com.fasterxml.jackson.core/jackson-annotations]]
             [lein-license "0.1.6"]]
 
-  ;; :doo {:build "test"}
+  :doo {:build "test"}
 
   :node-webkit-build {
                       :root "resources/public" ; your node-webkit app root directory
