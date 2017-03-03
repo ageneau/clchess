@@ -8,7 +8,7 @@
             [clchess.chess :as chess]
             [clchess.specs.board :as sboard]
             [clchess.specs.chess :as schess]
-            [clj-chess.board :refer [to-fen]]
+            [clj-chess.board :refer [to-fen start-fen]]
             [clj-chess.game :as game]
             [clj-chess.pgn :refer [parse-pgn]]))
 
@@ -129,5 +129,10 @@ Nc4 Nxc4 22. Bxc4 Nb6 23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7
 f3 Bc8 34. Kf2 Bf5 35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5
 40. Rd6 Kc5 41. Ra6 Nf2 42. g4 Bd3 43. Re6 1/2-1/2")
 
-;; (deftest load-pgn
-;;   (is (= (chess/load-pgn initial-game pgn-string-0))))
+(deftest load-pgn
+  (let [game (chess/load-pgn start-fen pgn-string-0)
+        last-pos (-> game
+                     (get ::schess/moves)
+                     (last)
+                     (get ::schess/fen))]
+    (is (= last-pos "8/8/R5p1/2k3p1/1p4P1/1P1b1P2/3K1n2/8 w - - 1 43"))))

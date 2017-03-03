@@ -186,7 +186,7 @@
                      :pgn ::schess/pgn)
         :ret ::schess/game)
 
-;; (stest/instrument `load-pgn)
+(stest/instrument `load-pgn)
 
 (defn load-pgn [{:keys [::schess/initial-fen
                         ::schess/moves
