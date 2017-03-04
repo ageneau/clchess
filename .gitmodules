@@ -1,0 +1,3 @@
+[submodule "resources/public/lila"]
+	path = resources/public/lila
+	url = https://github.com/ageneau/lila-assets.git
